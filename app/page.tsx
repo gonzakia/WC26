@@ -1,7 +1,16 @@
+import Link from "next/link";
 import { ArrowRight, Goal, ShieldCheck, Trophy, Users } from "lucide-react";
 import { SectionCard } from "@/components/section-card";
+import {
+  CreateGroupForm,
+  EmptyGroupsState,
+  GroupLink,
+  JoinGroupForm,
+} from "@/components/group-forms";
+import { getDashboardData } from "@/lib/data";
+import { formatKickoff } from "@/lib/date";
 import { formatPoints } from "@/lib/format";
-import { sampleLeaderboard, sampleMatches } from "@/lib/sample-data";
+import { sampleLeaderboard } from "@/lib/sample-data";
 
 const scoringRules = [
   {
@@ -21,7 +30,9 @@ const scoringRules = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const { currentUser, memberships, matches } = await getDashboardData();
+
   return (
     <main className="relative overflow-hidden">
       <div className="absolute inset-0 bg-grid bg-[size:42px_42px] opacity-20" />
@@ -37,7 +48,7 @@ export default function Home() {
             </p>
           </div>
           <div className="rounded-full border border-ink/10 bg-white/70 px-4 py-2 text-sm text-slate-700 backdrop-blur">
-            MVP scaffold
+            Demo user: {currentUser.displayName}
           </div>
         </header>
 
@@ -61,9 +72,9 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap gap-4">
               <a
                 className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-                href="#foundation"
+                href="#dashboard"
               >
-                Explore the MVP
+                Open dashboard
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
@@ -72,6 +83,12 @@ export default function Home() {
               >
                 View sample leaderboard
               </a>
+              <Link
+                className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
+                href="/admin/results"
+              >
+                Enter match results
+              </Link>
             </div>
           </div>
 
@@ -89,7 +106,7 @@ export default function Home() {
             </div>
 
             <div className="mt-6 space-y-4">
-              {sampleMatches.slice(0, 2).map((match) => (
+              {matches.slice(0, 2).map((match) => (
                 <div
                   key={match.id}
                   className="rounded-2xl border border-white/10 bg-white/5 p-4"
@@ -103,11 +120,11 @@ export default function Home() {
                         {match.homeTeam} vs {match.awayTeam}
                       </p>
                       <p className="mt-2 text-sm text-slate-300">
-                        {match.kickoff} · {match.stadium}
+                        {formatKickoff(match.kickoffAt)} · {match.venue ?? "TBD"}
                       </p>
                     </div>
                     <div className="rounded-full bg-pitch-400/15 px-3 py-1 text-xs font-semibold text-pitch-100">
-                      Picks open
+                      {match.kickoffAt > new Date() ? "Picks open" : "Locked"}
                     </div>
                   </div>
                 </div>
@@ -136,8 +153,57 @@ export default function Home() {
       </section>
 
       <section
-        id="foundation"
+        id="dashboard"
         className="mx-auto max-w-7xl px-6 pb-8 lg:px-10"
+      >
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-[2rem] border border-ink/10 bg-white/75 p-8 shadow-glow backdrop-blur">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
+              Your groups
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-ink">
+              Jump into a league and start making picks
+            </h2>
+
+            <div className="mt-6 space-y-4">
+              {memberships.length === 0 ? (
+                <EmptyGroupsState />
+              ) : (
+                memberships.map((membership) => (
+                  <div
+                    key={membership.id}
+                    className="flex flex-col gap-4 rounded-[1.75rem] border border-black/5 bg-sand/45 p-5 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div>
+                      <p className="text-lg font-semibold text-ink">
+                        {membership.group.name}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        Invite code {membership.group.inviteCode} ·{" "}
+                        {membership.group._count.members} members
+                      </p>
+                    </div>
+                    <GroupLink groupId={membership.group.id} />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-6">
+            <SectionCard eyebrow="Create" title="Start a new private group">
+              <CreateGroupForm />
+            </SectionCard>
+            <SectionCard eyebrow="Join" title="Enter an invite code">
+              <JoinGroupForm />
+            </SectionCard>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="foundation"
+        className="mx-auto max-w-7xl px-6 pb-8 pt-8 lg:px-10"
       >
         <div className="grid gap-6 lg:grid-cols-3">
           <SectionCard eyebrow="Users" title="People create or join private groups">
@@ -221,10 +287,36 @@ export default function Home() {
             </div>
 
             <div className="mt-6 rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-700">
-              Later, this table can be driven by an aggregate query that sums
-              points across every scored prediction in a group.
+              The real leaderboard lives on each group page. This sample shows
+              the scoring shape before you have match results to total up.
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-16 pt-2 lg:px-10">
+        <div className="rounded-[2rem] border border-ink/10 bg-[#0d1f17] p-8 text-white shadow-glow">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-200">
+            Next build target
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold">
+            Group pages are now the center of the app
+          </h2>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
+            Open a group to see the database-backed match list, save predictions,
+            and watch the leaderboard update as results come in. Authentication
+            is still mocked by a seeded demo user so the app stays easy to
+            understand while you learn.
+          </p>
+          {memberships[0] ? (
+            <Link
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-slate-100"
+              href={`/groups/${memberships[0].group.id}`}
+            >
+              Open {memberships[0].group.name}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : null}
         </div>
       </section>
     </main>

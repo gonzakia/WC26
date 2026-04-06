@@ -25,6 +25,12 @@ Node is available.
 - Award 1 point for the correct winner or draw
 - Show a leaderboard for each group
 
+## Current demo mode
+
+The app currently runs in demo mode using the seeded user `kia@example.com`.
+That keeps the focus on learning data flow, server actions, and Prisma queries
+before adding authentication.
+
 ## Data model
 
 The initial Prisma schema includes:
@@ -48,7 +54,7 @@ The initial Prisma schema includes:
 ## Suggested next steps
 
 1. Add authentication with Supabase or NextAuth.
-2. Build match and group pages backed by Prisma queries.
-3. Add forms for creating groups and submitting predictions.
-4. Add an admin workflow to enter final match scores.
-5. Compute leaderboard totals from scored predictions.
+2. Add an admin workflow to enter final match scores.
+3. Persist awarded points when results are confirmed instead of computing them only at read time.
+4. Add validation and friendly form error states with `useActionState`.
+5. Replace demo data entry with official World Cup fixtures once the tournament list is available.

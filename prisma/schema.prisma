@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum MembershipRole {
-  OWNER
-  MEMBER
-}
-
 model User {
   id            String        @id @default(cuid())
   email         String        @unique
@@ -36,13 +31,13 @@ model Group {
 }
 
 model GroupMember {
-  id        String         @id @default(cuid())
-  createdAt DateTime       @default(now())
-  role      MembershipRole @default(MEMBER)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  role      String   @default("MEMBER")
   userId    String
   groupId   String
-  user      User           @relation(fields: [userId], references: [id])
-  group     Group          @relation(fields: [groupId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  group     Group    @relation(fields: [groupId], references: [id])
 
   @@unique([userId, groupId])
 }
