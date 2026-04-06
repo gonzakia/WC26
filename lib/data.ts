@@ -1,23 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { DEMO_USER_EMAIL } from "@/lib/demo-user";
+import { requireCurrentUser } from "@/lib/auth";
 import { buildLeaderboard } from "@/lib/leaderboard";
 
-export async function getDemoUser() {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_USER_EMAIL },
-  });
-
-  if (!user) {
-    throw new Error(
-      `Demo user ${DEMO_USER_EMAIL} not found. Run the Prisma seed before starting the app.`,
-    );
-  }
-
-  return user;
-}
-
 export async function getDashboardData() {
-  const currentUser = await getDemoUser();
+  const currentUser = await requireCurrentUser();
 
   const [memberships, matches] = await Promise.all([
     prisma.groupMember.findMany({
@@ -49,7 +35,7 @@ export async function getDashboardData() {
 }
 
 export async function getGroupPageData(groupId: string) {
-  const currentUser = await getDemoUser();
+  const currentUser = await requireCurrentUser();
 
   const membership = await prisma.groupMember.findUnique({
     where: {

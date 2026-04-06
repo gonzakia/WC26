@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { SignOutButton } from "@/components/auth-forms";
+import { requireCurrentUser } from "@/lib/auth";
 import { ResultForm } from "@/components/result-form";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminResultsPage() {
+  await requireCurrentUser();
+
   const matches = await prisma.match.findMany({
     orderBy: { kickoffAt: "asc" },
   });
@@ -11,13 +15,16 @@ export default async function AdminResultsPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#faf5ea_0%,#f0e6d3_100%)] px-6 py-10 lg:px-10">
       <div className="mx-auto max-w-5xl">
-        <Link
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-ink"
-          href="/"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to dashboard
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <Link
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-ink"
+            href="/"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to dashboard
+          </Link>
+          <SignOutButton />
+        </div>
 
         <section className="mt-6 rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">

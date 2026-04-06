@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Goal, ShieldCheck, Trophy, Users } from "lucide-react";
+import { SignOutButton } from "@/components/auth-forms";
 import { SectionCard } from "@/components/section-card";
 import {
   CreateGroupForm,
@@ -48,9 +49,13 @@ export default async function Home() {
             </p>
           </div>
           <div className="rounded-full border border-ink/10 bg-white/70 px-4 py-2 text-sm text-slate-700 backdrop-blur">
-            Demo user: {currentUser.displayName}
+            Signed in as {currentUser.displayName}
           </div>
         </header>
+
+        <div className="mt-4 flex justify-end">
+          <SignOutButton />
+        </div>
 
         <div className="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
@@ -305,8 +310,8 @@ export default async function Home() {
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
             Open a group to see the database-backed match list, save predictions,
             and watch the leaderboard update as results come in. Authentication
-            is still mocked by a seeded demo user so the app stays easy to
-            understand while you learn.
+            now uses a simple Prisma-backed session so each user can have their
+            own groups and picks.
           </p>
           {memberships[0] ? (
             <Link

@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { clearSession, createSession, requireCurrentUser } from "@/lib/auth";
 import { scorePrediction } from "@/lib/scoring";
 import { prisma } from "@/lib/prisma";
 import { generateInviteCode } from "@/lib/invite-code";
-import { getDemoUser } from "@/lib/data";
 
 function parseScore(value: FormDataEntryValue | null) {
   const parsed = Number(value);
@@ -17,8 +17,46 @@ function parseScore(value: FormDataEntryValue | null) {
   return parsed;
 }
 
+function parseText(value: FormDataEntryValue | null) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+export async function signInOrCreateUser(formData: FormData) {
+  const email = parseText(formData.get("email")).toLowerCase();
+  const displayName = parseText(formData.get("displayName"));
+
+  if (!email) {
+    throw new Error("Email is required.");
+  }
+
+  let user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    if (!displayName) {
+      throw new Error("Display name is required when creating a new account.");
+    }
+
+    user = await prisma.user.create({
+      data: {
+        email,
+        displayName,
+      },
+    });
+  }
+
+  await createSession(user.id);
+  redirect("/");
+}
+
+export async function signOut() {
+  await clearSession();
+  redirect("/sign-in");
+}
+
 export async function createGroup(formData: FormData) {
-  const currentUser = await getDemoUser();
+  const currentUser = await requireCurrentUser();
   const rawName = formData.get("name");
   const name = typeof rawName === "string" ? rawName.trim() : "";
 
@@ -51,7 +89,7 @@ export async function createGroup(formData: FormData) {
 }
 
 export async function joinGroup(formData: FormData) {
-  const currentUser = await getDemoUser();
+  const currentUser = await requireCurrentUser();
   const rawInviteCode = formData.get("inviteCode");
   const inviteCode =
     typeof rawInviteCode === "string" ? rawInviteCode.trim().toUpperCase() : "";
@@ -87,7 +125,7 @@ export async function joinGroup(formData: FormData) {
 }
 
 export async function savePrediction(formData: FormData) {
-  const currentUser = await getDemoUser();
+  const currentUser = await requireCurrentUser();
   const groupId = String(formData.get("groupId") ?? "");
   const matchId = String(formData.get("matchId") ?? "");
 

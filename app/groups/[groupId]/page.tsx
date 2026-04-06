@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Trophy, Users } from "lucide-react";
+import { SignOutButton } from "@/components/auth-forms";
 import { PredictionForm } from "@/components/prediction-form";
 import { getGroupPageData } from "@/lib/data";
 import { formatKickoff } from "@/lib/date";
@@ -24,13 +25,16 @@ export default async function GroupPage({ params }: GroupPageProps) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#faf5ea_0%,#f0e6d3_100%)] px-6 py-10 lg:px-10">
       <div className="mx-auto max-w-7xl">
-        <Link
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-ink"
-          href="/"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to dashboard
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <Link
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-ink"
+            href="/"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to dashboard
+          </Link>
+          <SignOutButton />
+        </div>
 
         <section className="mt-6 rounded-[2rem] border border-white/60 bg-[#0d1f17] p-8 text-white shadow-glow">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -40,8 +44,11 @@ export default async function GroupPage({ params }: GroupPageProps) {
               </p>
               <h1 className="mt-3 text-4xl font-semibold">{group.name}</h1>
               <p className="mt-3 text-sm leading-7 text-slate-300">
-                Demo user <span className="font-semibold text-white">{currentUser.displayName}</span>
-                {" "}is currently making picks in this league.
+                Signed in as{" "}
+                <span className="font-semibold text-white">
+                  {currentUser.displayName}
+                </span>
+                {" "}and making picks in this league.
               </p>
             </div>
 

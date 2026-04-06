@@ -25,11 +25,14 @@ Node is available.
 - Award 1 point for the correct winner or draw
 - Show a leaderboard for each group
 
-## Current demo mode
+## Current auth flow
 
-The app currently runs in demo mode using the seeded user `kia@example.com`.
-That keeps the focus on learning data flow, server actions, and Prisma queries
-before adding authentication.
+The app now uses a simple custom session flow backed by Prisma:
+
+- users sign in with an email
+- if the email does not exist yet, the app creates a new user
+- a session token is stored in an HTTP-only cookie
+- session records live in the database
 
 ## Data model
 
@@ -48,13 +51,18 @@ The initial Prisma schema includes:
 3. Install dependencies with `npm install`.
 4. Generate Prisma client with `npm run prisma:generate`.
 5. Create the local database with `npx prisma migrate dev --name init`.
-6. Seed demo data with `npm run prisma:seed`.
+6. Seed starter data with `npm run prisma:seed`.
 7. Start the app with `npm run dev`.
+
+If you changed the Prisma schema after already creating your database, run:
+
+- `npx prisma migrate dev --name add_sessions`
+- `npm run prisma:generate`
 
 ## Suggested next steps
 
-1. Add authentication with Supabase or NextAuth.
-2. Add an admin workflow to enter final match scores.
-3. Persist awarded points when results are confirmed instead of computing them only at read time.
-4. Add validation and friendly form error states with `useActionState`.
-5. Replace demo data entry with official World Cup fixtures once the tournament list is available.
+1. Add passwordless email links or an OAuth provider.
+2. Restrict admin result entry to group owners or admins.
+3. Add validation and friendly form error states with `useActionState`.
+4. Add profile editing so users can change display names.
+5. Replace starter match data with official World Cup fixtures once the tournament list is available.
