@@ -10,6 +10,8 @@ or correct outcomes, and compete on a shared leaderboard.
 - TypeScript
 - Tailwind CSS
 - Prisma
+- Resend for sign-in emails
+- football-data.org for fixture/result sync
 - SQLite for local development
 
 This repo is scaffolded manually because the current environment does not have
@@ -29,10 +31,22 @@ Node is available.
 
 The app now uses a simple custom session flow backed by Prisma:
 
-- users sign in with an email
-- if the email does not exist yet, the app creates a new user
+- users request a one-time sign-in code with an email
+- if Resend is configured, the code is emailed to them
+- in local development without email credentials, the verification code is shown on the `/verify` page
+- after code verification, the app creates a new user if needed
 - a session token is stored in an HTTP-only cookie
-- session records live in the database
+- session records and login codes live in the database
+
+## Match data sync
+
+The app can sync World Cup fixtures and final results from football-data.org.
+That means you do not have to seed every match or manually update scores for
+each group.
+
+- manual sync is available on `/admin/results`
+- automatic sync is supported through `/api/cron/sync-world-cup`
+- confirmed results automatically recalculate prediction points
 
 ## Data model
 
@@ -54,15 +68,31 @@ The initial Prisma schema includes:
 6. Seed starter data with `npm run prisma:seed`.
 7. Start the app with `npm run dev`.
 
+Set these environment variables if you want production-style behavior:
+
+- `RESEND_API_KEY`
+- `EMAIL_FROM`
+- `FOOTBALL_DATA_API_TOKEN`
+- `WORLD_CUP_SEASON` defaults to `2026`
+- `CRON_SECRET`
+
 If you changed the Prisma schema after already creating your database, run:
 
-- `npx prisma migrate dev --name add_sessions`
+- `npx prisma migrate dev`
 - `npm run prisma:generate`
+
+## Suggested deployment setup
+
+1. Configure Resend and verify a sending domain or use the Resend test sender for development.
+2. Add your football-data.org API token.
+3. Protect `/api/cron/sync-world-cup` with `CRON_SECRET`.
+4. If you deploy on Vercel, the included `vercel.json` schedules `/api/cron/sync-world-cup` every 6 hours.
+5. If you deploy somewhere else, point your scheduler at that same route instead.
 
 ## Suggested next steps
 
-1. Add passwordless email links or an OAuth provider.
-2. Restrict admin result entry to group owners or admins.
-3. Add validation and friendly form error states with `useActionState`.
-4. Add profile editing so users can change display names.
-5. Replace starter match data with official World Cup fixtures once the tournament list is available.
+1. Restrict data sync and manual overrides to app admins or group owners.
+2. Add validation and friendly form error states with `useActionState`.
+3. Add profile editing so users can change display names.
+4. Add a sync history table with provider responses and failure logs.
+5. Add richer result handling for extra time and penalty shootouts.

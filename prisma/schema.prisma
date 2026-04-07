@@ -19,6 +19,18 @@ model User {
   createdGroups Group[]       @relation("GroupCreator")
 }
 
+model LoginCode {
+  id              String   @id @default(cuid())
+  email           String
+  codeHash        String   @unique
+  displayNameHint String?
+  expiresAt       DateTime
+  usedAt          DateTime?
+  createdAt       DateTime @default(now())
+
+  @@index([email])
+}
+
 model Session {
   id        String   @id @default(cuid())
   tokenHash String   @unique
@@ -57,7 +69,10 @@ model GroupMember {
 model Match {
   id              String       @id @default(cuid())
   slug            String       @unique
+  externalMatchId String?      @unique
+  source          String?
   stage           String
+  groupName       String?
   kickoffAt       DateTime
   homeTeam        String
   awayTeam        String
@@ -65,6 +80,9 @@ model Match {
   homeScore       Int?
   awayScore       Int?
   resultConfirmed Boolean      @default(false)
+  status          String       @default("SCHEDULED")
+  sourceUpdatedAt DateTime?
+  syncedAt        DateTime?
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   predictions     Prediction[]

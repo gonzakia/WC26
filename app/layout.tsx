@@ -19,7 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={geist.variable}>{children}</body>
+      <body className={geist.variable}>
+        <div className="min-h-screen">
+          {children}
+          <footer className="border-t border-black/5 bg-white/60 px-6 py-4 text-center text-xs text-slate-500 backdrop-blur">
+            Data provided by football-data.org
+          </footer>
+        </div>
+      </body>
     </html>
   );
 }

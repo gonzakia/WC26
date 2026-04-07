@@ -1,4 +1,4 @@
-import { signInOrCreateUser, signOut } from "@/app/actions";
+import { signInOrCreateUser, signOut, verifySignInCode } from "@/app/actions";
 
 export function AuthForm() {
   return (
@@ -34,7 +34,50 @@ export function AuthForm() {
         className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
         type="submit"
       >
-        Sign in or create account
+        Send sign-in code
+      </button>
+    </form>
+  );
+}
+
+export function VerifyCodeForm({
+  email,
+  devCode,
+}: {
+  email: string;
+  devCode?: string;
+}) {
+  return (
+    <form action={verifySignInCode} className="space-y-4">
+      <input name="email" type="hidden" value={email} />
+
+      <div>
+        <label className="text-sm font-medium text-slate-700" htmlFor="code">
+          Verification code
+        </label>
+        <input
+          className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm tracking-[0.3em] text-ink outline-none transition placeholder:tracking-normal placeholder:text-slate-400 focus:border-pitch-500"
+          id="code"
+          inputMode="numeric"
+          maxLength={6}
+          name="code"
+          placeholder="123456"
+          required
+          type="text"
+        />
+      </div>
+
+      {devCode ? (
+        <div className="rounded-2xl border border-dashed border-pitch-300 bg-pitch-50 p-4 text-sm text-pitch-900">
+          Development code: <span className="font-semibold">{devCode}</span>
+        </div>
+      ) : null}
+
+      <button
+        className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+        type="submit"
+      >
+        Verify and sign in
       </button>
     </form>
   );

@@ -2,7 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { clearSession, createSession, requireCurrentUser } from "@/lib/auth";
+import {
+  clearSession,
+  consumeLoginCode,
+  createLoginCode,
+  createSession,
+  requireCurrentUser,
+} from "@/lib/auth";
+import { canSendEmail } from "@/lib/email";
+import { syncWorldCupMatches } from "@/lib/match-sync";
 import { scorePrediction } from "@/lib/scoring";
 import { prisma } from "@/lib/prisma";
 import { generateInviteCode } from "@/lib/invite-code";
@@ -29,14 +37,40 @@ export async function signInOrCreateUser(formData: FormData) {
     throw new Error("Email is required.");
   }
 
+  const { code, emailSent } = await createLoginCode(email, displayName);
+
+  const params = new URLSearchParams({
+    email,
+  });
+
+  if (!emailSent || !canSendEmail()) {
+    params.set("devCode", code);
+  }
+
+  redirect(`/verify?${params.toString()}`);
+}
+
+export async function verifySignInCode(formData: FormData) {
+  const email = parseText(formData.get("email")).toLowerCase();
+  const code = parseText(formData.get("code"));
+
+  if (!email || !code) {
+    throw new Error("Email and verification code are required.");
+  }
+
+  const loginCode = await consumeLoginCode(email, code);
+
+  if (!loginCode) {
+    throw new Error("That code is invalid or expired.");
+  }
+
   let user = await prisma.user.findUnique({
     where: { email },
   });
 
   if (!user) {
-    if (!displayName) {
-      throw new Error("Display name is required when creating a new account.");
-    }
+    const displayName =
+      loginCode.displayNameHint?.trim() || email.split("@")[0] || "Player";
 
     user = await prisma.user.create({
       data: {
@@ -186,6 +220,12 @@ export async function savePrediction(formData: FormData) {
   });
 
   revalidatePath(`/groups/${groupId}`);
+}
+
+export async function syncWorldCupData() {
+  await requireCurrentUser();
+  await syncWorldCupMatches();
+  revalidatePath("/admin/results");
 }
 
 export async function confirmMatchResult(formData: FormData) {

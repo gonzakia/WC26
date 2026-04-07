@@ -1,15 +1,28 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { AuthForm } from "@/components/auth-forms";
+import { VerifyCodeForm } from "@/components/auth-forms";
 import { SectionCard } from "@/components/section-card";
 import { getCurrentUser } from "@/lib/auth";
 
-export default async function SignInPage() {
+type VerifyPageProps = {
+  searchParams: Promise<{
+    email?: string;
+    devCode?: string;
+  }>;
+};
+
+export default async function VerifyPage({ searchParams }: VerifyPageProps) {
   const user = await getCurrentUser();
 
   if (user) {
     redirect("/");
+  }
+
+  const { email = "", devCode } = await searchParams;
+
+  if (!email) {
+    redirect("/sign-in");
   }
 
   return (
@@ -19,37 +32,30 @@ export default async function SignInPage() {
         <div className="grid w-full gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-pitch-700">
-              WC26 Predictions
+              Verify sign-in
             </p>
             <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-tight text-ink sm:text-6xl">
-              Passwordless sign-in for your World Cup prediction league.
+              Enter the one-time code for {email}.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
-              Enter your email and the app will issue a short-lived one-time code.
-              If Resend is configured, the code is delivered by email. Otherwise,
-              the app falls back to showing the code on the next screen for local
-              development.
+              The code expires after 15 minutes and can only be used once.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <div className="inline-flex items-center rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">
-                Passwordless local auth
-              </div>
               <Link
                 className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
-                href="/"
+                href="/sign-in"
               >
-                Back home
+                Request a new code
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
 
-          <SectionCard eyebrow="Auth" title="Request a one-time sign-in code">
-            <AuthForm />
+          <SectionCard eyebrow="Code" title="Finish signing in">
+            <VerifyCodeForm devCode={devCode} email={email} />
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              If the email is new, the app will create the account after the code
-              is verified using the display name you provide here.
+              In production, you would normally receive this code by email.
             </p>
           </SectionCard>
         </div>
