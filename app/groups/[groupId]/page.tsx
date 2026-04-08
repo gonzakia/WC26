@@ -2,9 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Trophy, Users } from "lucide-react";
 import { SignOutButton } from "@/components/auth-forms";
-import { PredictionForm } from "@/components/prediction-form";
+import { MatchBrowser } from "@/components/match-browser";
 import { getGroupPageData } from "@/lib/data";
-import { formatKickoff } from "@/lib/date";
 
 type GroupPageProps = {
   params: Promise<{
@@ -24,7 +23,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#faf5ea_0%,#f0e6d3_100%)] px-6 py-10 lg:px-10">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl" id="top">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-ink"
@@ -69,61 +68,22 @@ export default async function GroupPage({ params }: GroupPageProps) {
           </div>
         </section>
 
-        <section className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+        <section className="mt-8 grid gap-8 lg:grid-cols-[1.35fr_0.65fr]">
           <div className="rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
               Matches
             </p>
             <h2 className="mt-3 text-3xl font-semibold text-ink">
-              Save a prediction for every match
+              Navigate the tournament your way
             </h2>
-
-            <div className="mt-6 space-y-5">
-              {matches.map((match) => {
-                const prediction = predictionsByMatchId.get(match.id);
-                const locked = match.kickoffAt <= new Date();
-
-                return (
-                  <div
-                    key={match.id}
-                    className="rounded-[1.75rem] border border-black/5 bg-sand/50 p-5"
-                  >
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-pitch-700">
-                          {match.stage}
-                        </p>
-                        <h3 className="mt-2 text-2xl font-semibold text-ink">
-                          {match.homeTeam} vs {match.awayTeam}
-                        </h3>
-                        <p className="mt-2 text-sm text-slate-600">
-                          {formatKickoff(match.kickoffAt)} · {match.venue ?? "Venue TBD"}
-                        </p>
-                        {match.resultConfirmed ? (
-                          <p className="mt-3 text-sm font-medium text-pitch-800">
-                            Final score: {match.homeScore} - {match.awayScore}
-                          </p>
-                        ) : null}
-                      </div>
-
-                      <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">
-                        {locked ? "Locked" : "Open"}
-                      </div>
-                    </div>
-
-                    <div className="mt-5">
-                      <PredictionForm
-                        defaultAway={prediction?.predictedAway}
-                        defaultHome={prediction?.predictedHome}
-                        groupId={group.id}
-                        locked={locked}
-                        matchId={match.id}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <MatchBrowser
+              groupId={group.id}
+              matches={matches.map((match) => ({
+                ...match,
+                kickoffAt: match.kickoffAt.toISOString(),
+              }))}
+              predictionsByMatchId={Object.fromEntries(predictionsByMatchId.entries())}
+            />
           </div>
 
           <div className="rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">

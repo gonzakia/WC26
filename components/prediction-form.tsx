@@ -1,3 +1,5 @@
+"use client";
+
 import { savePrediction } from "@/app/actions";
 
 type PredictionFormProps = {
