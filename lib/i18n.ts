@@ -1,0 +1,338 @@
+import { cookies } from "next/headers";
+
+export const locales = ["en", "es"] as const;
+export type Locale = (typeof locales)[number];
+
+const defaultLocale: Locale = "en";
+const localeCookieName = "wc26_locale";
+
+export const translations = {
+  en: {
+    footer: "Data provided by football-data.org",
+    settings: {
+      title: "Settings",
+      language: "Language",
+      english: "English",
+      spanish: "Spanish",
+    },
+    common: {
+      backHome: "Back home",
+      backDashboard: "Back to dashboard",
+      signedInAs: "Signed in as",
+      signOut: "Sign out",
+      members: "members",
+      inviteCode: "Invite code",
+      openGroup: "Open group",
+      noGroupsYet: "No groups yet",
+      noGroupsCopy: "Create your first private league or join one with an invite code.",
+      open: "Open",
+      locked: "Locked",
+      venueTbd: "Venue TBD",
+      finalScore: "Final score",
+      home: "Home",
+      away: "Away",
+      savePick: "Save pick",
+    },
+    auth: {
+      appName: "WC26 Predictions",
+      signInTitle: "Passwordless sign-in for your World Cup prediction league.",
+      signInCopy:
+        "Enter your email and the app will issue a short-lived one-time code. If Resend is configured, the code is delivered by email. Otherwise, the app falls back to showing the code on the next screen for local development.",
+      localAuth: "Passwordless local auth",
+      authEyebrow: "Auth",
+      authCardTitle: "Request a one-time sign-in code",
+      authCardCopy:
+        "If the email is new, the app will create the account after the code is verified using the display name you provide here.",
+      email: "Email",
+      displayName: "Display name",
+      displayNamePlaceholder: "Only needed for first sign-in",
+      sendCode: "Send sign-in code",
+      verifyEyebrow: "Verify sign-in",
+      verifyTitle: "Enter the one-time code for",
+      verifyCopy: "The code expires after 15 minutes and can only be used once.",
+      requestNewCode: "Request a new code",
+      codeEyebrow: "Code",
+      finishSignIn: "Finish signing in",
+      verificationCode: "Verification code",
+      developmentCode: "Development code",
+      verifyAndSignIn: "Verify and sign in",
+      productionEmailNote:
+        "In production, you would normally receive this code by email.",
+      emailPlaceholder: "you@example.com",
+      verificationCodePlaceholder: "123456",
+    },
+    home: {
+      tagline: "Private groups. Match picks. Live leaderboard drama.",
+      learnBanner: "Learn full stack by building something social and score-driven",
+      heroTitle: "Make World Cup predictions with friends and rank every pick.",
+      heroCopy:
+        "This starter is designed around your project idea: users join a group, submit predictions before kickoff, earn points for exact scores or correct outcomes, and climb a shared leaderboard.",
+      openDashboard: "Open dashboard",
+      sampleLeaderboard: "View sample leaderboard",
+      enterResults: "Enter match results",
+      snapshot: "Matchday Snapshot",
+      groups: "Groups",
+      privateLeagues: "Private leagues",
+      scoring: "Scoring",
+      exactOutcome: "Exact + outcome",
+      competition: "Competition",
+      liveRanking: "Live ranking",
+      yourGroups: "Your groups",
+      jumpIntoLeague: "Jump into a league and start making picks",
+      create: "Create",
+      startPrivateGroup: "Start a new private group",
+      join: "Join",
+      enterInviteCode: "Enter an invite code",
+      users: "Users",
+      usersTitle: "People create or join private groups",
+      usersCopy:
+        "Each group becomes its own mini competition. The app will support invites, membership roles, and a shared leaderboard so friends or coworkers can compete together.",
+      predictions: "Predictions",
+      predictionsTitle: "One pick per match before kickoff",
+      predictionsCopy:
+        "Users predict the home and away score for every match. Once kickoff passes, the prediction locks and waits for the official final result.",
+      scoringTitle: "Simple rules that still feel competitive",
+      scoringCopy:
+        "The scoring model starts intentionally small so you can focus on learning the full stack before adding bonus questions or knockout tie-breakers.",
+      scoringModel: "Scoring model for v1",
+      exactScore: "Exact score",
+      exactScoreCopy: "Predict the final scoreline correctly.",
+      correctWinner: "Correct winner or draw",
+      correctWinnerCopy: "Get the match outcome right even if the score is off.",
+      wrongOutcome: "Wrong outcome",
+      wrongOutcomeCopy: "No points for an incorrect winner or draw call.",
+      sampleStandings: "Sample standings for a group",
+      leaderboardCopy:
+        "The real leaderboard lives on each group page. This sample shows the scoring shape before you have match results to total up.",
+      nextTarget: "Next build target",
+      nextTitle: "Group pages are now the center of the app",
+      nextCopy:
+        "Open a group to see the database-backed match list, save predictions, and watch the leaderboard update as results come in. Authentication now uses a simple Prisma-backed session so each user can have their own groups and picks.",
+    },
+    groupForms: {
+      groupName: "Group name",
+      groupNamePlaceholder: "Friday Friends",
+      createGroup: "Create group",
+      inviteCode: "Invite code",
+      inviteCodePlaceholder: "WC26DE",
+      joinGroup: "Join group",
+    },
+    groupPage: {
+      overview: "Group overview",
+      makingPicks: "and making picks in this league.",
+      matches: "Matches",
+      navigate: "Navigate the tournament your way",
+      leaderboard: "Leaderboard",
+      leaderboardTitle: "Live standings for this group",
+      leaderboardCopy:
+        "Points are computed from stored predictions and confirmed match results. Until results are entered, the leaderboard stays at zero.",
+      members: "Members",
+      inviteCode: "Invite code",
+      player: "Player",
+      exact: "Exact",
+      outcome: "Outcome",
+      total: "Total",
+    },
+    matchBrowser: {
+      toggleMenu: "Toggle Menu",
+      dateMenu: "Search matches by date",
+      stageMenu: "Search matches by stage",
+      groupStage: "Group stage",
+      knockoutBracket: "Knockout bracket",
+      backToGroups: "Back to groups",
+      round: "Round",
+      cup: "Cup",
+      match: "match",
+      matches: "matches",
+    },
+    admin: {
+      dataOps: "Data Ops",
+      title: "Sync World Cup fixtures and results",
+      copy:
+        "The app can pull matches and final scores from football-data.org, then automatically update prediction points for every group.",
+      lastSync: "Last sync",
+      noSync: "No automatic sync has run yet.",
+      manualOverride: "Manual override",
+      manualCopy:
+        "You should not need this often, but it stays available in case an external result is delayed or needs correction.",
+      syncNow: "Sync fixtures and results now",
+      confirmed: "Confirmed",
+      pending: "Pending",
+      homeScore: "Home score",
+      awayScore: "Away score",
+      updateResult: "Update result",
+      confirmResult: "Confirm result",
+    },
+  },
+  es: {
+    footer: "Datos proporcionados por football-data.org",
+    settings: {
+      title: "Configuracion",
+      language: "Idioma",
+      english: "Ingles",
+      spanish: "Espanol",
+    },
+    common: {
+      backHome: "Volver al inicio",
+      backDashboard: "Volver al panel",
+      signedInAs: "Sesion iniciada como",
+      signOut: "Cerrar sesion",
+      members: "miembros",
+      inviteCode: "Codigo de invitacion",
+      openGroup: "Abrir grupo",
+      noGroupsYet: "Todavia no hay grupos",
+      noGroupsCopy: "Crea tu primera liga privada o unete con un codigo de invitacion.",
+      open: "Abierto",
+      locked: "Cerrado",
+      venueTbd: "Sede por confirmar",
+      finalScore: "Marcador final",
+      home: "Local",
+      away: "Visitante",
+      savePick: "Guardar prediccion",
+    },
+    auth: {
+      appName: "WC26 Predictions",
+      signInTitle: "Inicio de sesion sin contrasena para tu liga del Mundial.",
+      signInCopy:
+        "Ingresa tu correo y la app generara un codigo temporal. Si Resend esta configurado, el codigo llegara por email. Si no, la app mostrara el codigo en la siguiente pantalla para desarrollo local.",
+      localAuth: "Acceso local sin contrasena",
+      authEyebrow: "Acceso",
+      authCardTitle: "Solicita un codigo de acceso",
+      authCardCopy:
+        "Si el correo es nuevo, la app creara la cuenta despues de verificar el codigo usando el nombre que escribas aqui.",
+      email: "Correo",
+      displayName: "Nombre visible",
+      displayNamePlaceholder: "Solo hace falta en el primer acceso",
+      sendCode: "Enviar codigo",
+      verifyEyebrow: "Verificar acceso",
+      verifyTitle: "Ingresa el codigo temporal para",
+      verifyCopy: "El codigo vence en 15 minutos y solo se puede usar una vez.",
+      requestNewCode: "Pedir un nuevo codigo",
+      codeEyebrow: "Codigo",
+      finishSignIn: "Completar acceso",
+      verificationCode: "Codigo de verificacion",
+      developmentCode: "Codigo de desarrollo",
+      verifyAndSignIn: "Verificar e ingresar",
+      productionEmailNote:
+        "En produccion, normalmente recibirias este codigo por correo.",
+      emailPlaceholder: "tu@correo.com",
+      verificationCodePlaceholder: "123456",
+    },
+    home: {
+      tagline: "Grupos privados. Predicciones. Drama en la tabla.",
+      learnBanner: "Aprende full stack creando algo social y competitivo",
+      heroTitle: "Haz predicciones del Mundial con amigos y clasifica cada resultado.",
+      heroCopy:
+        "Este proyecto esta pensado para tu idea: los usuarios se unen a un grupo, envian predicciones antes del inicio, ganan puntos por acertar el marcador o el resultado y suben en una tabla compartida.",
+      openDashboard: "Abrir panel",
+      sampleLeaderboard: "Ver tabla de ejemplo",
+      enterResults: "Ingresar resultados",
+      snapshot: "Resumen de jornada",
+      groups: "Grupos",
+      privateLeagues: "Ligas privadas",
+      scoring: "Puntuacion",
+      exactOutcome: "Exacto + resultado",
+      competition: "Competencia",
+      liveRanking: "Tabla en vivo",
+      yourGroups: "Tus grupos",
+      jumpIntoLeague: "Entra a una liga y empieza a predecir",
+      create: "Crear",
+      startPrivateGroup: "Crea un nuevo grupo privado",
+      join: "Unirse",
+      enterInviteCode: "Ingresa un codigo de invitacion",
+      users: "Usuarios",
+      usersTitle: "Las personas crean o se unen a grupos privados",
+      usersCopy:
+        "Cada grupo se convierte en su propia mini competencia. La app admitira invitaciones, roles de miembros y una tabla compartida para competir con amigos o familia.",
+      predictions: "Predicciones",
+      predictionsTitle: "Una prediccion por partido antes del inicio",
+      predictionsCopy:
+        "Los usuarios predicen el marcador del local y visitante para cada partido. Cuando empieza el juego, la prediccion se bloquea y espera el resultado final oficial.",
+      scoringTitle: "Reglas simples pero competitivas",
+      scoringCopy:
+        "El sistema de puntuacion empieza de forma intencionalmente simple para que puedas enfocarte en aprender full stack antes de agregar preguntas extra o desempates.",
+      scoringModel: "Sistema de puntos v1",
+      exactScore: "Marcador exacto",
+      exactScoreCopy: "Adivina correctamente el marcador final.",
+      correctWinner: "Ganador o empate correcto",
+      correctWinnerCopy: "Acertar el resultado aunque el marcador no sea exacto.",
+      wrongOutcome: "Resultado incorrecto",
+      wrongOutcomeCopy: "No hay puntos por elegir mal al ganador o empate.",
+      sampleStandings: "Tabla de ejemplo para un grupo",
+      leaderboardCopy:
+        "La tabla real vive en la pagina de cada grupo. Este ejemplo muestra la forma de puntuar antes de tener resultados reales.",
+      nextTarget: "Siguiente objetivo",
+      nextTitle: "Las paginas de grupo ahora son el centro de la app",
+      nextCopy:
+        "Abre un grupo para ver la lista de partidos desde la base de datos, guardar predicciones y ver como cambia la tabla cuando llegan los resultados. La autenticacion ahora usa una sesion simple con Prisma para que cada usuario tenga sus propios grupos y picks.",
+    },
+    groupForms: {
+      groupName: "Nombre del grupo",
+      groupNamePlaceholder: "Amigos del viernes",
+      createGroup: "Crear grupo",
+      inviteCode: "Codigo de invitacion",
+      inviteCodePlaceholder: "WC26DE",
+      joinGroup: "Unirse al grupo",
+    },
+    groupPage: {
+      overview: "Resumen del grupo",
+      makingPicks: "y haciendo predicciones en esta liga.",
+      matches: "Partidos",
+      navigate: "Navega el torneo a tu manera",
+      leaderboard: "Clasificacion",
+      leaderboardTitle: "Tabla en vivo de este grupo",
+      leaderboardCopy:
+        "Los puntos se calculan con predicciones guardadas y resultados confirmados. Hasta que entren resultados, la tabla se mantiene en cero.",
+      members: "Miembros",
+      inviteCode: "Codigo de invitacion",
+      player: "Jugador",
+      exact: "Exacto",
+      outcome: "Resultado",
+      total: "Total",
+    },
+    matchBrowser: {
+      toggleMenu: "Menu desplegable",
+      dateMenu: "Buscar partidos por fecha",
+      stageMenu: "Buscar partidos por fase",
+      groupStage: "Fase de grupos",
+      knockoutBracket: "Llave final",
+      backToGroups: "Volver a los grupos",
+      round: "Ronda",
+      cup: "Copa",
+      match: "partido",
+      matches: "partidos",
+    },
+    admin: {
+      dataOps: "Datos",
+      title: "Sincronizar partidos y resultados del Mundial",
+      copy:
+        "La app puede traer partidos y marcadores finales desde football-data.org y luego actualizar automaticamente los puntos de cada grupo.",
+      lastSync: "Ultima sincronizacion",
+      noSync: "Todavia no se ha ejecutado una sincronizacion automatica.",
+      manualOverride: "Ajuste manual",
+      manualCopy:
+        "No deberias necesitar esto muy seguido, pero sigue disponible por si un resultado externo se retrasa o necesita correccion.",
+      syncNow: "Sincronizar partidos y resultados ahora",
+      confirmed: "Confirmado",
+      pending: "Pendiente",
+      homeScore: "Marcador local",
+      awayScore: "Marcador visitante",
+      updateResult: "Actualizar resultado",
+      confirmResult: "Confirmar resultado",
+    },
+  },
+} as const;
+
+export async function getLocale(): Promise<Locale> {
+  const cookieStore = await cookies();
+  const value = cookieStore.get(localeCookieName)?.value;
+  return locales.includes(value as Locale) ? (value as Locale) : defaultLocale;
+}
+
+export function getTranslations(locale: Locale) {
+  return translations[locale];
+}
+
+export function getLocaleCookieName() {
+  return localeCookieName;
+}

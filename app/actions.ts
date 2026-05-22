@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   clearSession,
@@ -14,6 +15,7 @@ import { syncWorldCupMatches } from "@/lib/match-sync";
 import { scorePrediction } from "@/lib/scoring";
 import { prisma } from "@/lib/prisma";
 import { generateInviteCode } from "@/lib/invite-code";
+import { getLocaleCookieName, locales, type Locale } from "@/lib/i18n";
 
 function parseScore(value: FormDataEntryValue | null) {
   const parsed = Number(value);
@@ -27,6 +29,24 @@ function parseScore(value: FormDataEntryValue | null) {
 
 function parseText(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+export async function setLanguage(formData: FormData) {
+  const locale = parseText(formData.get("locale"));
+  const redirectTo = parseText(formData.get("redirectTo")) || "/";
+
+  if (!locales.includes(locale as Locale)) {
+    throw new Error("Unsupported language.");
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(getLocaleCookieName(), locale, {
+    path: "/",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+
+  redirect(redirectTo);
 }
 
 export async function signInOrCreateUser(formData: FormData) {

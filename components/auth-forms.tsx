@@ -1,17 +1,29 @@
 import { signInOrCreateUser, signOut, verifySignInCode } from "@/app/actions";
 
-export function AuthForm() {
+type AuthLabels = {
+  email: string;
+  emailPlaceholder: string;
+  displayName: string;
+  displayNamePlaceholder: string;
+  sendCode: string;
+  verificationCode: string;
+  verificationCodePlaceholder: string;
+  developmentCode: string;
+  verifyAndSignIn: string;
+};
+
+export function AuthForm({ labels }: { labels: AuthLabels }) {
   return (
     <form action={signInOrCreateUser} className="space-y-4">
       <div>
         <label className="text-sm font-medium text-slate-700" htmlFor="email">
-          Email
+          {labels.email}
         </label>
         <input
           className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-pitch-500"
           id="email"
           name="email"
-          placeholder="kia@example.com"
+          placeholder={labels.emailPlaceholder}
           required
           type="email"
         />
@@ -19,13 +31,13 @@ export function AuthForm() {
 
       <div>
         <label className="text-sm font-medium text-slate-700" htmlFor="displayName">
-          Display name
+          {labels.displayName}
         </label>
         <input
           className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-pitch-500"
           id="displayName"
           name="displayName"
-          placeholder="Only needed for first sign-in"
+          placeholder={labels.displayNamePlaceholder}
           type="text"
         />
       </div>
@@ -34,7 +46,7 @@ export function AuthForm() {
         className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
         type="submit"
       >
-        Send sign-in code
+        {labels.sendCode}
       </button>
     </form>
   );
@@ -43,9 +55,11 @@ export function AuthForm() {
 export function VerifyCodeForm({
   email,
   devCode,
+  labels,
 }: {
   email: string;
   devCode?: string;
+  labels: AuthLabels;
 }) {
   return (
     <form action={verifySignInCode} className="space-y-4">
@@ -53,7 +67,7 @@ export function VerifyCodeForm({
 
       <div>
         <label className="text-sm font-medium text-slate-700" htmlFor="code">
-          Verification code
+          {labels.verificationCode}
         </label>
         <input
           className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm tracking-[0.3em] text-ink outline-none transition placeholder:tracking-normal placeholder:text-slate-400 focus:border-pitch-500"
@@ -61,7 +75,7 @@ export function VerifyCodeForm({
           inputMode="numeric"
           maxLength={6}
           name="code"
-          placeholder="123456"
+          placeholder={labels.verificationCodePlaceholder}
           required
           type="text"
         />
@@ -69,7 +83,7 @@ export function VerifyCodeForm({
 
       {devCode ? (
         <div className="rounded-2xl border border-dashed border-pitch-300 bg-pitch-50 p-4 text-sm text-pitch-900">
-          Development code: <span className="font-semibold">{devCode}</span>
+          {labels.developmentCode}: <span className="font-semibold">{devCode}</span>
         </div>
       ) : null}
 
@@ -77,20 +91,20 @@ export function VerifyCodeForm({
         className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
         type="submit"
       >
-        Verify and sign in
+        {labels.verifyAndSignIn}
       </button>
     </form>
   );
 }
 
-export function SignOutButton() {
+export function SignOutButton({ label }: { label: string }) {
   return (
     <form action={signOut}>
       <button
         className="rounded-full border border-ink/10 bg-white/75 px-4 py-2 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
         type="submit"
       >
-        Sign out
+        {label}
       </button>
     </form>
   );

@@ -7,23 +7,44 @@ type MatchLike = {
   groupName?: string | null;
 };
 
-const KNOCKOUT_STAGE_LABELS: Record<string, string> = {
-  LAST_32: "Round of 32",
-  ROUND_OF_32: "Round of 32",
-  ROUND_32: "Round of 32",
-  LAST_16: "Round of 16",
-  ROUND_OF_16: "Round of 16",
-  ROUND_16: "Round of 16",
-  QUARTER_FINALS: "Quarter-finals",
-  QUARTER_FINAL: "Quarter-finals",
-  SEMI_FINALS: "Semi-finals",
-  SEMI_FINAL: "Semi-finals",
-  THIRD_PLACE: "Third-place play-off",
-  FINAL: "Final",
+const STAGE_LABELS: Record<string, { en: string; es: string }> = {
+  GROUP_STAGE: { en: "Group stage", es: "Fase de grupos" },
+  LAST_32: { en: "Round of 32", es: "Dieciseisavos" },
+  ROUND_OF_32: { en: "Round of 32", es: "Dieciseisavos" },
+  ROUND_32: { en: "Round of 32", es: "Dieciseisavos" },
+  LAST_16: { en: "Round of 16", es: "Octavos" },
+  ROUND_OF_16: { en: "Round of 16", es: "Octavos" },
+  ROUND_16: { en: "Round of 16", es: "Octavos" },
+  QUARTER_FINALS: { en: "Quarter-finals", es: "Cuartos de final" },
+  QUARTER_FINAL: { en: "Quarter-finals", es: "Cuartos de final" },
+  SEMI_FINALS: { en: "Semi-finals", es: "Semifinales" },
+  SEMI_FINAL: { en: "Semi-finals", es: "Semifinales" },
+  THIRD_PLACE: { en: "Third-place play-off", es: "Partido por el tercer puesto" },
+  FINAL: { en: "Final", es: "Final" },
 };
 
-export function normalizeStageLabel(stage: string) {
-  return KNOCKOUT_STAGE_LABELS[stage] ?? stage.replaceAll("_", " ");
+export function normalizeStageLabel(stage: string, locale: "en" | "es" = "en") {
+  const direct = STAGE_LABELS[stage];
+
+  if (direct) {
+    return direct[locale];
+  }
+
+  return stage.replaceAll("_", " ");
+}
+
+export function normalizeRoleLabel(role: string, locale: "en" | "es" = "en") {
+  const normalized = role.toUpperCase();
+
+  if (normalized === "OWNER") {
+    return locale === "es" ? "Dueno" : "Owner";
+  }
+
+  if (normalized === "MEMBER") {
+    return locale === "es" ? "Miembro" : "Member";
+  }
+
+  return role;
 }
 
 export function isGroupStageMatch(match: MatchLike) {
@@ -57,7 +78,7 @@ export function getKnockoutStageOrder(stage: string) {
   }
 }
 
-export function groupMatchesByDate<T extends MatchLike>(matches: T[]) {
+export function groupMatchesByDate<T extends MatchLike>(matches: T[], locale = "en-US") {
   const map = new Map<string, { label: string; matches: T[] }>();
 
   for (const match of matches) {
@@ -70,7 +91,7 @@ export function groupMatchesByDate<T extends MatchLike>(matches: T[]) {
     }
 
     map.set(key, {
-      label: formatCalendarDate(match.kickoffAt),
+      label: formatCalendarDate(match.kickoffAt, locale),
       matches: [match],
     });
   }

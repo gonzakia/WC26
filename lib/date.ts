@@ -1,5 +1,5 @@
-export function formatKickoff(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
+export function formatKickoff(date: Date, locale = "en-US") {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -7,8 +7,8 @@ export function formatKickoff(date: Date) {
   }).format(date);
 }
 
-export function formatCalendarDate(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
+export function formatCalendarDate(date: Date, locale = "en-US") {
+  return new Intl.DateTimeFormat(locale, {
     weekday: "short",
     month: "short",
     day: "numeric",

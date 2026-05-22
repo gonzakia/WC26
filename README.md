@@ -89,6 +89,28 @@ If you changed the Prisma schema after already creating your database, run:
 4. If you deploy on Vercel, the included `vercel.json` schedules `/api/cron/sync-world-cup` every 6 hours.
 5. If you deploy somewhere else, point your scheduler at that same route instead.
 
+## Deployment note
+
+The current Prisma datasource uses SQLite, which is fine for local development
+but is not the right production database for a public, globally accessible app
+hosted on serverless infrastructure.
+
+Before launching this to friends and family, the recommended next move is:
+
+1. Switch `DATABASE_URL` to a hosted PostgreSQL database.
+2. Regenerate and apply migrations against that production database.
+3. Deploy the app to Vercel with the production environment variables set.
+
+The repo already includes a `vercel-build` script:
+
+- `npm run vercel-build`
+
+That matches Prisma's recommended Vercel deployment flow using:
+
+- `prisma generate`
+- `prisma migrate deploy`
+- `next build`
+
 ## Suggested next steps
 
 1. Restrict data sync and manual overrides to app admins or group owners.

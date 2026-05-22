@@ -8,6 +8,12 @@ type PredictionFormProps = {
   defaultHome?: number;
   defaultAway?: number;
   locked: boolean;
+  labels: {
+    home: string;
+    away: string;
+    savePick: string;
+    locked: string;
+  };
 };
 
 export function PredictionForm({
@@ -16,6 +22,7 @@ export function PredictionForm({
   defaultHome,
   defaultAway,
   locked,
+  labels,
 }: PredictionFormProps) {
   return (
     <form action={savePrediction} className="flex flex-wrap items-end gap-3">
@@ -24,7 +31,7 @@ export function PredictionForm({
 
       <div>
         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Home
+          {labels.home}
         </label>
         <input
           className="mt-2 w-20 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
@@ -38,7 +45,7 @@ export function PredictionForm({
 
       <div>
         <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Away
+          {labels.away}
         </label>
         <input
           className="mt-2 w-20 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
@@ -55,7 +62,7 @@ export function PredictionForm({
         disabled={locked}
         type="submit"
       >
-        {locked ? "Locked" : "Save pick"}
+        {locked ? labels.locked : labels.savePick}
       </button>
     </form>
   );

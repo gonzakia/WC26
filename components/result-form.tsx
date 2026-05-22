@@ -13,9 +13,19 @@ type ResultFormProps = {
     awayScore: number | null;
     resultConfirmed: boolean;
   };
+  labels: {
+    venueTbd: string;
+    confirmed: string;
+    pending: string;
+    homeScore: string;
+    awayScore: string;
+    updateResult: string;
+    confirmResult: string;
+  };
+  locale: string;
 };
 
-export function ResultForm({ match }: ResultFormProps) {
+export function ResultForm({ match, labels, locale }: ResultFormProps) {
   return (
     <form action={confirmMatchResult} className="rounded-[1.75rem] border border-black/5 bg-sand/45 p-5">
       <input name="matchId" type="hidden" value={match.id} />
@@ -29,19 +39,19 @@ export function ResultForm({ match }: ResultFormProps) {
             {match.homeTeam} vs {match.awayTeam}
           </h3>
           <p className="mt-2 text-sm text-slate-600">
-            {formatKickoff(match.kickoffAt)} · {match.venue ?? "Venue TBD"}
+            {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.venueTbd}
           </p>
         </div>
 
         <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">
-          {match.resultConfirmed ? "Confirmed" : "Pending"}
+          {match.resultConfirmed ? labels.confirmed : labels.pending}
         </div>
       </div>
 
       <div className="mt-5 flex flex-wrap items-end gap-3">
         <div>
           <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-            Home score
+            {labels.homeScore}
           </label>
           <input
             className="mt-2 w-24 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
@@ -55,7 +65,7 @@ export function ResultForm({ match }: ResultFormProps) {
 
         <div>
           <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-            Away score
+            {labels.awayScore}
           </label>
           <input
             className="mt-2 w-24 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
@@ -71,7 +81,7 @@ export function ResultForm({ match }: ResultFormProps) {
           className="inline-flex rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
           type="submit"
         >
-          {match.resultConfirmed ? "Update result" : "Confirm result"}
+          {match.resultConfirmed ? labels.updateResult : labels.confirmResult}
         </button>
       </div>
     </form>

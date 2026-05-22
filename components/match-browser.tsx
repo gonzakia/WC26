@@ -5,7 +5,6 @@ import {
   CalendarDays,
   ChevronDown,
   ChevronLeft,
-  Flag,
   GitBranch,
 } from "lucide-react";
 import { PredictionForm } from "@/components/prediction-form";
@@ -39,6 +38,30 @@ type MatchBrowserProps = {
   groupId: string;
   matches: BrowserMatch[];
   predictionsByMatchId: Record<string, BrowserPrediction>;
+  locale: string;
+  labels: {
+    common: {
+      venueTbd: string;
+      finalScore: string;
+      home: string;
+      away: string;
+      savePick: string;
+      locked: string;
+      open: string;
+    };
+    matchBrowser: {
+      toggleMenu: string;
+      dateMenu: string;
+      stageMenu: string;
+      groupStage: string;
+      knockoutBracket: string;
+      backToGroups: string;
+      round: string;
+      cup: string;
+      match: string;
+      matches: string;
+    };
+  };
 };
 
 const FLAG_EMOJIS: Record<string, string> = {
@@ -92,8 +115,8 @@ const FLAG_EMOJIS: Record<string, string> = {
   Uzbekistan: "🇺🇿",
 };
 
-function formatKickoff(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
+function formatKickoff(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -115,18 +138,18 @@ function getFlagEmoji(teamName: string) {
   return matchedKey ? FLAG_EMOJIS[matchedKey] : "🏳️";
 }
 
-function getGroupId(groupName: string) {
-  return groupName.toLowerCase().replace(/\s+/g, "-");
-}
-
 function MatchItem({
   match,
   groupId,
   prediction,
+  labels,
+  locale,
 }: {
   match: BrowserMatch;
   groupId: string;
   prediction?: BrowserPrediction;
+  labels: MatchBrowserProps["labels"];
+  locale: string;
 }) {
   const kickoff = new Date(match.kickoffAt);
   const locked = kickoff <= new Date();
@@ -149,17 +172,17 @@ function MatchItem({
             {match.homeTeam} vs {match.awayTeam}
           </h3>
           <p className="mt-2 text-sm text-slate-600">
-            {formatKickoff(match.kickoffAt)} · {match.venue ?? "Venue TBD"}
+            {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.common.venueTbd}
           </p>
           {match.resultConfirmed ? (
             <p className="mt-3 text-sm font-medium text-pitch-800">
-              Final score: {match.homeScore} - {match.awayScore}
+              {labels.common.finalScore}: {match.homeScore} - {match.awayScore}
             </p>
           ) : null}
         </div>
 
         <div className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">
-          {locked ? "Locked" : "Open"}
+          {locked ? labels.common.locked : labels.common.open}
         </div>
       </div>
 
@@ -169,6 +192,12 @@ function MatchItem({
           defaultHome={prediction?.predictedHome}
           groupId={groupId}
           locked={locked}
+          labels={{
+            home: labels.common.home,
+            away: labels.common.away,
+            savePick: labels.common.savePick,
+            locked: labels.common.locked,
+          }}
           matchId={match.id}
         />
       </div>
@@ -180,6 +209,8 @@ export function MatchBrowser({
   groupId,
   matches,
   predictionsByMatchId,
+  locale,
+  labels,
 }: MatchBrowserProps) {
   const matchesWithDate = useMemo(
     () =>
@@ -190,7 +221,7 @@ export function MatchBrowser({
     [matches],
   );
 
-  const dates = groupMatchesByDate(matchesWithDate);
+  const dates = groupMatchesByDate(matchesWithDate, locale);
   const groups = groupStageMatchesByGroup(matchesWithDate);
   const knockoutRounds = Object.entries(groupKnockoutMatchesByRound(matchesWithDate))
     .sort(([a], [b]) => getKnockoutStageOrder(a) - getKnockoutStageOrder(b))
@@ -220,9 +251,9 @@ export function MatchBrowser({
             <CalendarDays className="h-5 w-5 text-pitch-200" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-pitch-200">
-                Toggle Menu
+                {labels.matchBrowser.toggleMenu}
               </p>
-              <h3 className="mt-1 text-xl font-semibold">Search matches by date</h3>
+              <h3 className="mt-1 text-xl font-semibold">{labels.matchBrowser.dateMenu}</h3>
             </div>
           </div>
           <ChevronDown
@@ -257,6 +288,8 @@ export function MatchBrowser({
                     <MatchItem
                       key={match.id}
                       groupId={groupId}
+                      labels={labels}
+                      locale={locale}
                       match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
                       prediction={predictionsByMatchId[match.id]}
                     />
@@ -277,9 +310,9 @@ export function MatchBrowser({
             <GitBranch className="h-5 w-5 text-pitch-200" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-pitch-200">
-                Toggle Menu
+                {labels.matchBrowser.toggleMenu}
               </p>
-              <h3 className="mt-1 text-xl font-semibold">Search matches by stage</h3>
+              <h3 className="mt-1 text-xl font-semibold">{labels.matchBrowser.stageMenu}</h3>
             </div>
           </div>
           <ChevronDown
@@ -299,7 +332,7 @@ export function MatchBrowser({
                 onClick={() => setStageMode("group")}
                 type="button"
               >
-                Group stage
+                {labels.matchBrowser.groupStage}
               </button>
               <button
                 className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
@@ -310,7 +343,7 @@ export function MatchBrowser({
                 onClick={() => setStageMode("knockout")}
                 type="button"
               >
-                Knockout bracket
+                {labels.matchBrowser.knockoutBracket}
               </button>
             </div>
 
@@ -324,7 +357,7 @@ export function MatchBrowser({
                       type="button"
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Back to groups
+                      {labels.matchBrowser.backToGroups}
                     </button>
 
                     {groups
@@ -337,6 +370,8 @@ export function MatchBrowser({
                               <MatchItem
                                 key={match.id}
                                 groupId={groupId}
+                                labels={labels}
+                                locale={locale}
                                 match={{
                                   ...match,
                                   kickoffAt: match.kickoffAt.toISOString(),
@@ -368,7 +403,7 @@ export function MatchBrowser({
                           type="button"
                         >
                           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-pitch-200">
-                            Group
+                            {labels.matchBrowser.groupStage}
                           </p>
                           <h4 className="mt-2 text-xl font-semibold text-white">
                             {section.groupName.replace('_', ' ')}
@@ -410,9 +445,17 @@ export function MatchBrowser({
                             activeRound === round.stage ? "text-pitch-700" : "text-pitch-200"
                           }`}
                         >
-                          {index === knockoutRounds.length - 1 ? "Cup" : "Round"}
+                          {index === knockoutRounds.length - 1
+                            ? labels.matchBrowser.cup
+                            : labels.matchBrowser.round}
                         </p>
                         <h4 className="mt-2 text-lg font-semibold">{round.label}</h4>
+                        <p className="mt-1 text-sm opacity-80">
+                          {round.matches.length}{" "}
+                          {round.matches.length === 1
+                            ? labels.matchBrowser.match
+                            : labels.matchBrowser.matches}
+                        </p>
                         <div className="mt-4 space-y-3">
                           {round.matches.slice(0, 4).map((match) => (
                             <div
@@ -444,6 +487,8 @@ export function MatchBrowser({
                             <MatchItem
                               key={match.id}
                               groupId={groupId}
+                              labels={labels}
+                              locale={locale}
                               match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
                               prediction={predictionsByMatchId[match.id]}
                             />

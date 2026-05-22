@@ -3,10 +3,14 @@ import { ChevronLeft } from "lucide-react";
 import { SignOutButton } from "@/components/auth-forms";
 import { requireCurrentUser } from "@/lib/auth";
 import { ResultForm } from "@/components/result-form";
+import { SettingsMenu } from "@/components/settings-menu";
 import { SyncWorldCupButton } from "@/components/sync-controls";
+import { getLocale, getTranslations } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminResultsPage() {
+  const locale = await getLocale();
+  const t = getTranslations(locale);
   await requireCurrentUser();
 
   const [matches, latestSyncedMatch] = await Promise.all([
@@ -34,48 +38,62 @@ export default async function AdminResultsPage() {
             href="/"
           >
             <ChevronLeft className="h-4 w-4" />
-            Back to dashboard
+            {t.common.backDashboard}
           </Link>
-          <SignOutButton />
+          <div className="flex items-center gap-3">
+            <SettingsMenu currentLocale={locale} labels={t.settings} />
+            <SignOutButton label={t.common.signOut} />
+          </div>
         </div>
 
         <section className="mt-6 rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
-            Data Ops
+            {t.admin.dataOps}
           </p>
           <h1 className="mt-3 text-4xl font-semibold text-ink">
-            Sync World Cup fixtures and results
+            {t.admin.title}
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600">
-            The app can pull matches and final scores from football-data.org, then
-            automatically update prediction points for every group.
+            {t.admin.copy}
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-4 rounded-[1.75rem] border border-black/5 bg-sand/45 p-5">
-            <SyncWorldCupButton />
+            <SyncWorldCupButton label={t.admin.syncNow} />
             <div className="text-sm text-slate-600">
               <p className="font-medium text-ink">
                 {latestSyncedMatch?.syncedAt
-                  ? `Last sync: ${latestSyncedMatch.syncedAt.toLocaleString()}`
-                  : "No automatic sync has run yet."}
+                  ? `${t.admin.lastSync}: ${latestSyncedMatch.syncedAt.toLocaleString()}`
+                  : t.admin.noSync}
               </p>
               <p className="mt-1">
-                Data provided by football-data.org.
+                {t.footer}
               </p>
             </div>
           </div>
 
           <div className="mt-8">
-            <h2 className="text-2xl font-semibold text-ink">Manual override</h2>
+            <h2 className="text-2xl font-semibold text-ink">{t.admin.manualOverride}</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-              You should not need this often, but it stays available in case an
-              external result is delayed or needs correction.
+              {t.admin.manualCopy}
             </p>
           </div>
 
           <div className="mt-8 space-y-5">
             {matches.map((match) => (
-              <ResultForm key={match.id} match={match} />
+              <ResultForm
+                key={match.id}
+                labels={{
+                  venueTbd: t.common.venueTbd,
+                  confirmed: t.admin.confirmed,
+                  pending: t.admin.pending,
+                  homeScore: t.admin.homeScore,
+                  awayScore: t.admin.awayScore,
+                  updateResult: t.admin.updateResult,
+                  confirmResult: t.admin.confirmResult,
+                }}
+                locale={locale === "es" ? "es-ES" : "en-US"}
+                match={match}
+              />
             ))}
           </div>
         </section>
