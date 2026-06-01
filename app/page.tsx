@@ -12,6 +12,7 @@ import {
 import { getDashboardData } from "@/lib/data";
 import { formatKickoff } from "@/lib/date";
 import { formatPoints } from "@/lib/format";
+import { getCurrentUser } from "@/lib/auth";
 import { getLocale, getTranslations } from "@/lib/i18n";
 import { sampleLeaderboard } from "@/lib/sample-data";
 import { normalizeStageLabel } from "@/lib/tournament";
@@ -19,6 +20,55 @@ import { normalizeStageLabel } from "@/lib/tournament";
 export default async function Home() {
   const locale = await getLocale();
   const t = getTranslations(locale);
+
+  const sessionUser = await getCurrentUser();
+
+  if (!sessionUser) {
+    return (
+      <main className="relative min-h-screen overflow-hidden">
+        <div className="absolute inset-0 bg-grid bg-[size:42px_42px] opacity-15" />
+        <section className="mx-auto flex min-h-screen max-w-4xl flex-col px-6 py-8 lg:px-10">
+          <div className="flex justify-end">
+            <SettingsMenu currentLocale={locale} labels={t.settings} />
+          </div>
+
+          <div className="flex flex-1 items-center">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-pitch-700">
+                {t.home.appName}
+              </p>
+              <h1 className="mt-5 text-5xl font-semibold leading-tight text-ink sm:text-6xl">
+                {t.home.appSummary}
+              </h1>
+              <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700">
+                {t.home.appIntro}
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  href="/sign-in?mode=register"
+                >
+                  {t.home.register}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+
+                <Link
+                  className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
+                  href="/sign-in?mode=login"
+                >
+                  {t.home.login}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   const { currentUser, memberships, matches } = await getDashboardData();
   const scoringRules = [
     {

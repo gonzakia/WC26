@@ -66,8 +66,8 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
               labels={{
                 email: t.auth.email,
                 emailPlaceholder: t.auth.emailPlaceholder,
-                displayName: t.auth.displayName,
-                displayNamePlaceholder: t.auth.displayNamePlaceholder,
+                username: t.auth.username,
+                usernamePlaceholder: t.auth.usernamePlaceholder,
                 sendCode: t.auth.sendCode,
                 verificationCode: t.auth.verificationCode,
                 verificationCodePlaceholder: t.auth.verificationCodePlaceholder,

@@ -52,9 +52,14 @@ export async function setLanguage(formData: FormData) {
 export async function signInOrCreateUser(formData: FormData) {
   const email = parseText(formData.get("email")).toLowerCase();
   const displayName = parseText(formData.get("displayName"));
+  const intent = parseText(formData.get("intent"));
 
   if (!email) {
     throw new Error("Email is required.");
+  }
+
+  if (intent === "register" && !displayName) {
+    throw new Error("Username is required.");
   }
 
   const { code, emailSent } = await createLoginCode(email, displayName);

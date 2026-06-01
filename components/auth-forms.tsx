@@ -3,8 +3,8 @@ import { signInOrCreateUser, signOut, verifySignInCode } from "@/app/actions";
 type AuthLabels = {
   email: string;
   emailPlaceholder: string;
-  displayName: string;
-  displayNamePlaceholder: string;
+  username: string;
+  usernamePlaceholder: string;
   sendCode: string;
   verificationCode: string;
   verificationCodePlaceholder: string;
@@ -12,9 +12,16 @@ type AuthLabels = {
   verifyAndSignIn: string;
 };
 
-export function AuthForm({ labels }: { labels: AuthLabels }) {
+export function AuthForm({
+  labels,
+  mode,
+}: {
+  labels: AuthLabels;
+  mode: "login" | "register";
+}) {
   return (
     <form action={signInOrCreateUser} className="space-y-4">
+      <input name="intent" type="hidden" value={mode} />
       <div>
         <label className="text-sm font-medium text-slate-700" htmlFor="email">
           {labels.email}
@@ -29,18 +36,21 @@ export function AuthForm({ labels }: { labels: AuthLabels }) {
         />
       </div>
 
-      <div>
-        <label className="text-sm font-medium text-slate-700" htmlFor="displayName">
-          {labels.displayName}
-        </label>
-        <input
-          className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-pitch-500"
-          id="displayName"
-          name="displayName"
-          placeholder={labels.displayNamePlaceholder}
-          type="text"
-        />
-      </div>
+      {mode === "register" ? (
+        <div>
+          <label className="text-sm font-medium text-slate-700" htmlFor="displayName">
+            {labels.username}
+          </label>
+          <input
+            className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-pitch-500"
+            id="displayName"
+            name="displayName"
+            placeholder={labels.usernamePlaceholder}
+            required
+            type="text"
+          />
+        </div>
+      ) : null}
 
       <button
         className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
