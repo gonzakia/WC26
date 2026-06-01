@@ -12,7 +12,7 @@ or correct outcomes, and compete on a shared leaderboard.
 - Prisma
 - Resend for sign-in emails
 - football-data.org for fixture/result sync
-- SQLite for local development
+- Postgres for production, SQLite was used locally
 
 This repo is scaffolded manually because the current environment does not have
 Node.js installed, but the project structure is ready to install and run once
@@ -64,7 +64,7 @@ The initial Prisma schema includes:
 2. Copy `.env.example` to `.env`.
 3. Install dependencies with `npm install`.
 4. Generate Prisma client with `npm run prisma:generate`.
-5. Create the local database with `npx prisma migrate dev --name init`.
+5. Point `DATABASE_URL` at a Postgres database.
 6. Seed starter data with `npm run prisma:seed`.
 7. Start the app with `npm run dev`.
 
@@ -75,10 +75,11 @@ Set these environment variables if you want production-style behavior:
 - `FOOTBALL_DATA_API_TOKEN`
 - `WORLD_CUP_SEASON` defaults to `2026`
 - `CRON_SECRET`
+- `DIRECT_URL` for Prisma schema commands
 
-If you changed the Prisma schema after already creating your database, run:
+If you change the Prisma schema after already creating your database, run:
 
-- `npx prisma migrate dev`
+- `prisma db push`
 - `npm run prisma:generate`
 
 ## Suggested deployment setup
@@ -86,29 +87,28 @@ If you changed the Prisma schema after already creating your database, run:
 1. Configure Resend and verify a sending domain or use the Resend test sender for development.
 2. Add your football-data.org API token.
 3. Protect `/api/cron/sync-world-cup` with `CRON_SECRET`.
-4. If you deploy on Vercel, the included `vercel.json` schedules `/api/cron/sync-world-cup` every 6 hours.
+4. If you deploy on Vercel Hobby, the included `vercel.json` schedules `/api/cron/sync-world-cup` once per day.
 5. If you deploy somewhere else, point your scheduler at that same route instead.
 
 ## Deployment note
 
-The current Prisma datasource uses SQLite, which is fine for local development
-but is not the right production database for a public, globally accessible app
-hosted on serverless infrastructure.
+The production database should be Postgres.
 
 Before launching this to friends and family, the recommended next move is:
 
-1. Switch `DATABASE_URL` to a hosted PostgreSQL database.
-2. Regenerate and apply migrations against that production database.
+1. Keep the Neon Postgres integration connected to the project.
+2. Add Neon’s direct connection string as `DIRECT_URL`.
 3. Deploy the app to Vercel with the production environment variables set.
+4. Let the `vercel-build` script run `prisma db push` so the tables are created.
 
 The repo already includes a `vercel-build` script:
 
 - `npm run vercel-build`
 
-That matches Prisma's recommended Vercel deployment flow using:
+That uses:
 
+- `prisma db push`
 - `prisma generate`
-- `prisma migrate deploy`
 - `next build`
 
 ## Suggested next steps

@@ -38,32 +38,6 @@ async function main() {
       role: "OWNER",
     },
   });
-
-  await prisma.match.upsert({
-    where: { slug: "mexico-vs-japan-2026-06-11" },
-    update: {},
-    create: {
-      slug: "mexico-vs-japan-2026-06-11",
-      stage: "Group Stage",
-      kickoffAt: new Date("2026-06-11T20:00:00.000Z"),
-      homeTeam: "Mexico",
-      awayTeam: "Japan",
-      venue: "Estadio Azteca",
-    },
-  });
-
-  await prisma.match.upsert({
-    where: { slug: "united-states-vs-ghana-2026-06-12" },
-    update: {},
-    create: {
-      slug: "united-states-vs-ghana-2026-06-12",
-      stage: "Group Stage",
-      kickoffAt: new Date("2026-06-12T19:00:00.000Z"),
-      homeTeam: "United States",
-      awayTeam: "Ghana",
-      venue: "SoFi Stadium",
-    },
-  });
 }
 
 main()

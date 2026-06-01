@@ -19,10 +19,24 @@ type MatchCardProps = {
     predictedHome: number;
     predictedAway: number;
   };
+  labels?: {
+    home: string;
+    away: string;
+    savePick: string;
+    locked: string;
+  };
 };
 
-export function MatchCard({ match, groupId, prediction }: MatchCardProps) {
+const defaultLabels = {
+  home: "Home",
+  away: "Away",
+  savePick: "Save pick",
+  locked: "Locked",
+};
+
+export function MatchCard({ match, groupId, prediction, labels }: MatchCardProps) {
   const locked = match.kickoffAt <= new Date();
+  const mergedLabels = labels ?? defaultLabels;
 
   return (
     <div className="rounded-[1.75rem] border border-black/5 bg-sand/50 p-5">
@@ -62,6 +76,7 @@ export function MatchCard({ match, groupId, prediction }: MatchCardProps) {
           defaultHome={prediction?.predictedHome}
           groupId={groupId}
           locked={locked}
+          labels={mergedLabels}
           matchId={match.id}
         />
       </div>
