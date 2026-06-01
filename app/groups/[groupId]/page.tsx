@@ -6,6 +6,7 @@ import { MatchBrowser } from "@/components/match-browser";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getGroupPageData } from "@/lib/data";
 import { getLocale, getTranslations } from "@/lib/i18n";
+import { normalizeRoleLabel } from "@/lib/tournament";
 
 type GroupPageProps = {
   params: Promise<{
@@ -132,7 +133,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
                   <div>
                     <p className="font-medium">{entry.name}</p>
                     <p className="text-xs uppercase tracking-[0.15em] text-slate-500">
-                      {entry.role}
+                      {normalizeRoleLabel(entry.role, locale)}
                     </p>
                   </div>
                   <span>{entry.exact}</span>

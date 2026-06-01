@@ -151,6 +151,7 @@ function MatchItem({
   labels: MatchBrowserProps["labels"];
   locale: string;
 }) {
+  const language = locale.startsWith("es") ? "es" : "en";
   const kickoff = new Date(match.kickoffAt);
   const locked = kickoff <= new Date();
 
@@ -160,7 +161,7 @@ function MatchItem({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#0d1f17]">
-              {normalizeStageLabel(match.stage)}
+              {normalizeStageLabel(match.stage, language)}
             </p>
             {match.groupName ? (
               <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">
@@ -212,6 +213,7 @@ export function MatchBrowser({
   locale,
   labels,
 }: MatchBrowserProps) {
+  const language = locale.startsWith("es") ? "es" : "en";
   const matchesWithDate = useMemo(
     () =>
       matches.map((match) => ({
@@ -227,7 +229,7 @@ export function MatchBrowser({
     .sort(([a], [b]) => getKnockoutStageOrder(a) - getKnockoutStageOrder(b))
     .map(([stage, roundMatches]) => ({
       stage,
-      label: normalizeStageLabel(stage),
+      label: normalizeStageLabel(stage, language),
       matches: roundMatches,
     }));
 

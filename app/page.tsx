@@ -14,6 +14,7 @@ import { formatKickoff } from "@/lib/date";
 import { formatPoints } from "@/lib/format";
 import { getLocale, getTranslations } from "@/lib/i18n";
 import { sampleLeaderboard } from "@/lib/sample-data";
+import { normalizeStageLabel } from "@/lib/tournament";
 
 export default async function Home() {
   const locale = await getLocale();
@@ -123,7 +124,7 @@ export default async function Home() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-xs uppercase tracking-[0.25em] text-pitch-200">
-                        {match.stage}
+                        {normalizeStageLabel(match.stage, locale)}
                       </p>
                       <p className="mt-2 text-lg font-medium">
                         {match.homeTeam} vs {match.awayTeam}
@@ -187,7 +188,7 @@ export default async function Home() {
                     noGroupsCopy: t.common.noGroupsCopy,
                     openGroup: t.common.openGroup,
                   }}
-                />
+              />
               ) : (
                 memberships.map((membership) => (
                   <div
@@ -213,12 +214,12 @@ export default async function Home() {
           <div className="grid gap-6">
             <SectionCard eyebrow={t.home.create} title={t.home.startPrivateGroup}>
               <CreateGroupForm
-                labels={{
-                  ...t.groupForms,
-                  noGroupsYet: t.common.noGroupsYet,
-                  noGroupsCopy: t.common.noGroupsCopy,
-                  openGroup: t.common.openGroup,
-                }}
+                  labels={{
+                    ...t.groupForms,
+                    noGroupsYet: t.common.noGroupsYet,
+                    noGroupsCopy: t.common.noGroupsCopy,
+                    openGroup: t.common.openGroup,
+                  }}
               />
             </SectionCard>
             <SectionCard eyebrow={t.home.join} title={t.home.enterInviteCode}>

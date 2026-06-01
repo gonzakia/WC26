@@ -53,10 +53,12 @@ export default async function SignInPage() {
             <AuthForm
               labels={{
                 email: t.auth.email,
+                emailPlaceholder: t.auth.emailPlaceholder,
                 displayName: t.auth.displayName,
                 displayNamePlaceholder: t.auth.displayNamePlaceholder,
                 sendCode: t.auth.sendCode,
                 verificationCode: t.auth.verificationCode,
+                verificationCodePlaceholder: t.auth.verificationCodePlaceholder,
                 developmentCode: t.auth.developmentCode,
                 verifyAndSignIn: t.auth.verifyAndSignIn,
               }}
