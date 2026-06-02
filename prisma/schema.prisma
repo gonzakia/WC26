@@ -59,6 +59,7 @@ model GroupMember {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   role      String   @default("MEMBER")
+  displayName String?
   userId    String
   groupId   String
   user      User     @relation(fields: [userId], references: [id])

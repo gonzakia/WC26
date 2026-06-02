@@ -74,6 +74,9 @@ export async function getGroupPageData(groupId: string) {
           },
         },
       },
+      orderBy: {
+        createdAt: "asc",
+      },
     }),
     prisma.prediction.findMany({
       where: {
@@ -98,6 +101,7 @@ export async function getGroupPageData(groupId: string) {
     members.map((member) => ({
       id: member.id,
       role: member.role,
+      displayName: member.displayName,
       user: {
         displayName: member.user.displayName,
       },

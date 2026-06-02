@@ -1,4 +1,5 @@
 import { Clock3, MapPin } from "lucide-react";
+import { getCountryLabel } from "@/lib/country-labels";
 import { formatKickoff } from "@/lib/date";
 import { normalizeStageLabel } from "@/lib/tournament";
 
@@ -127,7 +128,8 @@ export function UpcomingMatchesSnapshot({
                           {normalizeStageLabel(match.stage, locale.startsWith("es") ? "es" : "en")}
                         </p>
                         <h3 className="mt-2 text-base font-semibold leading-snug text-white">
-                          {match.homeTeam} vs {match.awayTeam}
+                          {getCountryLabel(match.homeTeam, locale)} vs{" "}
+                          {getCountryLabel(match.awayTeam, locale)}
                         </h3>
                         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-300">
                           <span className="inline-flex items-center gap-1">

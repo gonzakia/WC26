@@ -14,6 +14,7 @@ type LeaderboardPrediction = {
 type LeaderboardMember = {
   id: string;
   role: string;
+  displayName: string | null;
   user: {
     displayName: string;
   };
@@ -62,7 +63,7 @@ export function buildLeaderboard(members: LeaderboardMember[]) {
 
       return {
         id: member.id,
-        name: member.user.displayName,
+        name: member.displayName?.trim() || member.user.displayName,
         role: member.role,
         exact,
         outcomes,

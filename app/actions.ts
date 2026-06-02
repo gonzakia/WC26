@@ -130,10 +130,17 @@ export async function signOut() {
 export async function createGroup(formData: FormData) {
   const currentUser = await requireCurrentUser();
   const rawName = formData.get("name");
+  const rawDisplayName = formData.get("displayName");
   const name = typeof rawName === "string" ? rawName.trim() : "";
+  const displayName =
+    typeof rawDisplayName === "string" ? rawDisplayName.trim() : "";
 
   if (!name) {
     throw new Error("Group name is required.");
+  }
+
+  if (!displayName) {
+    throw new Error("Display name is required.");
   }
 
   let inviteCode = generateInviteCode();
@@ -151,6 +158,7 @@ export async function createGroup(formData: FormData) {
         create: {
           userId: currentUser.id,
           role: "OWNER",
+          displayName,
         },
       },
     },
@@ -163,11 +171,18 @@ export async function createGroup(formData: FormData) {
 export async function joinGroup(formData: FormData) {
   const currentUser = await requireCurrentUser();
   const rawInviteCode = formData.get("inviteCode");
+  const rawDisplayName = formData.get("displayName");
   const inviteCode =
     typeof rawInviteCode === "string" ? rawInviteCode.trim().toUpperCase() : "";
+  const displayName =
+    typeof rawDisplayName === "string" ? rawDisplayName.trim() : "";
 
   if (!inviteCode) {
     throw new Error("Invite code is required.");
+  }
+
+  if (!displayName) {
+    throw new Error("Display name is required.");
   }
 
   const group = await prisma.group.findUnique({
@@ -178,6 +193,17 @@ export async function joinGroup(formData: FormData) {
     throw new Error("No group was found with that invite code.");
   }
 
+  const takenName = await prisma.groupMember.findFirst({
+    where: {
+      groupId: group.id,
+      displayName,
+    },
+  });
+
+  if (takenName && takenName.userId !== currentUser.id) {
+    throw new Error("That display name is already taken in this group.");
+  }
+
   await prisma.groupMember.upsert({
     where: {
       userId_groupId: {
@@ -185,14 +211,18 @@ export async function joinGroup(formData: FormData) {
         groupId: group.id,
       },
     },
-    update: {},
+    update: {
+      displayName,
+    },
     create: {
       userId: currentUser.id,
       groupId: group.id,
+      displayName,
     },
   });
 
   revalidatePath("/");
+  revalidatePath(`/groups/${group.id}`);
   redirect(`/groups/${group.id}`);
 }
 

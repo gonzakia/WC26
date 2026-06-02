@@ -4,6 +4,8 @@ import { createGroup, joinGroup } from "@/app/actions";
 type GroupFormLabels = {
   groupName: string;
   groupNamePlaceholder: string;
+  displayName: string;
+  displayNamePlaceholder: string;
   createGroup: string;
   inviteCode: string;
   inviteCodePlaceholder: string;
@@ -13,7 +15,17 @@ type GroupFormLabels = {
   openGroup: string;
 };
 
-export function CreateGroupForm({ labels }: { labels: GroupFormLabels }) {
+type GroupFormProps = {
+  labels: GroupFormLabels;
+  defaultDisplayName?: string;
+  displayNameFieldId?: string;
+};
+
+export function CreateGroupForm({
+  labels,
+  defaultDisplayName,
+  displayNameFieldId = "create-displayName",
+}: GroupFormProps) {
   return (
     <form action={createGroup} className="space-y-4">
       <div>
@@ -30,6 +42,24 @@ export function CreateGroupForm({ labels }: { labels: GroupFormLabels }) {
         />
       </div>
 
+      <div>
+        <label
+          className="text-sm font-medium text-slate-700"
+          htmlFor={displayNameFieldId}
+        >
+          {labels.displayName}
+        </label>
+        <input
+          className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none ring-0 transition placeholder:text-slate-400 focus:border-pitch-500"
+          id={displayNameFieldId}
+          name="displayName"
+          placeholder={labels.displayNamePlaceholder}
+          defaultValue={defaultDisplayName}
+          required
+          type="text"
+        />
+      </div>
+
       <button
         className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
         type="submit"
@@ -40,7 +70,11 @@ export function CreateGroupForm({ labels }: { labels: GroupFormLabels }) {
   );
 }
 
-export function JoinGroupForm({ labels }: { labels: GroupFormLabels }) {
+export function JoinGroupForm({
+  labels,
+  defaultDisplayName,
+  displayNameFieldId = "join-displayName",
+}: GroupFormProps) {
   return (
     <form action={joinGroup} className="space-y-4">
       <div>
@@ -53,6 +87,24 @@ export function JoinGroupForm({ labels }: { labels: GroupFormLabels }) {
           maxLength={6}
           name="inviteCode"
           placeholder={labels.inviteCodePlaceholder}
+          required
+          type="text"
+        />
+      </div>
+
+      <div>
+        <label
+          className="text-sm font-medium text-slate-700"
+          htmlFor={displayNameFieldId}
+        >
+          {labels.displayName}
+        </label>
+        <input
+          className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none ring-0 transition placeholder:text-slate-400 focus:border-pitch-500"
+          id={displayNameFieldId}
+          name="displayName"
+          placeholder={labels.displayNamePlaceholder}
+          defaultValue={defaultDisplayName}
           required
           type="text"
         />

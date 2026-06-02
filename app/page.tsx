@@ -197,6 +197,8 @@ export default async function Home() {
           <div className="grid gap-6">
             <SectionCard eyebrow={t.home.create} title={t.home.startPrivateGroup}>
               <CreateGroupForm
+                defaultDisplayName={currentUser.displayName}
+                displayNameFieldId="create-group-display-name"
                 labels={{
                   ...t.groupForms,
                   noGroupsYet: t.common.noGroupsYet,
@@ -207,6 +209,8 @@ export default async function Home() {
             </SectionCard>
             <SectionCard eyebrow={t.home.join} title={t.home.enterInviteCode}>
               <JoinGroupForm
+                defaultDisplayName={currentUser.displayName}
+                displayNameFieldId="join-group-display-name"
                 labels={{
                   ...t.groupForms,
                   noGroupsYet: t.common.noGroupsYet,

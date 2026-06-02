@@ -36,6 +36,7 @@ async function main() {
       userId: user.id,
       groupId: group.id,
       role: "OWNER",
+      displayName: "Kia",
     },
   });
 }

@@ -24,7 +24,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
     notFound();
   }
 
-  const { currentUser, group, leaderboard, matches, predictionsByMatchId } = data;
+  const { currentUser, group, membership, leaderboard, matches, predictionsByMatchId } = data;
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#faf5ea_0%,#f0e6d3_100%)] px-6 py-10 lg:px-10">
@@ -53,7 +53,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
               <p className="mt-3 text-sm leading-7 text-slate-300">
                 {t.common.signedInAs}{" "}
                 <span className="font-semibold text-white">
-                  {currentUser.displayName}
+                  {membership.displayName ?? currentUser.displayName}
                 </span>
                 {" "}{t.groupPage.makingPicks}
               </p>

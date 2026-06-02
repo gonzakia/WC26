@@ -8,6 +8,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import { PredictionForm } from "@/components/prediction-form";
+import { getCountryLabel } from "@/lib/country-labels";
 import {
   getKnockoutStageOrder,
   groupKnockoutMatchesByRound,
@@ -64,7 +65,38 @@ type MatchBrowserProps = {
   };
 };
 
+const TEAM_ORDER = [
+  // Group A
+  "Mexico", "Canada", "Brazil", "United States",
+  "Germany", "Netherlands", "Belgium", "Spain",
+  "France", "Argentina", "Portugal", "England",
+  "South Africa", "Bosnia-Herzegovina", "Morocco", "Paraguay",
+  "Curaçao", "Japan", "Egypt", "Cape Verde",
+  "Senegal", "Algeria", "Congo DR", "Croatia",
+  "South Korea", "Qatar", "Haiti", "Australia",
+  "Ivory Coast", "Sweden", "Iran", "Saudi Arabia",
+  "Iraq", "Austria", "Uzbekistan", "Panama",
+  "Czechia", "Switzerland", "Scotland", "Turkey",
+  "Ecuador", "Tunisia", "New Zealand", "Uruguay",
+  "Norway", "Jordan", "Colombia", "Panama"
+
+  // Group B
+  // add the countries here in correct order
+
+  // Group C
+  // add the countries here in correct order
+];
+
+const TEAM_ORDER_MAP = new Map(
+  TEAM_ORDER.map((team, index) => [team, index]),
+);
+
+function getTeamOrder(teamName: string) {
+  return TEAM_ORDER_MAP.get(teamName) ?? Number.MAX_SAFE_INTEGER;
+}
+
 const FLAG_EMOJIS: Record<string, string> = {
+  Mexico: "🇲🇽",
   Algeria: "🇩🇿",
   Argentina: "🇦🇷",
   Australia: "🇦🇺",
@@ -91,7 +123,6 @@ const FLAG_EMOJIS: Record<string, string> = {
   Ivory: "🇨🇮",
   Japan: "🇯🇵",
   Jordan: "🇯🇴",
-  Mexico: "🇲🇽",
   Morocco: "🇲🇦",
   Netherlands: "🇳🇱",
   "New Zealand": "🇳🇿",
@@ -154,6 +185,8 @@ function MatchItem({
   const language = locale.startsWith("es") ? "es" : "en";
   const kickoff = new Date(match.kickoffAt);
   const locked = kickoff <= new Date();
+  const homeTeam = getCountryLabel(match.homeTeam, locale);
+  const awayTeam = getCountryLabel(match.awayTeam, locale);
 
   return (
     <div className="rounded-[1.75rem] border border-black/5 bg-pitch-200/100 p-5">
@@ -170,7 +203,7 @@ function MatchItem({
             ) : null}
           </div>
           <h3 className="mt-3 text-2xl font-semibold text-ink">
-            {match.homeTeam} vs {match.awayTeam}
+            {homeTeam} vs {awayTeam}
           </h3>
           <p className="mt-2 text-sm text-slate-600">
             {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.common.venueTbd}
@@ -389,13 +422,23 @@ export function MatchBrowser({
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     {groups.map((section) => {
                       const countries = Array.from(
-                        new Set(
+                        new Set<string>(
                           section.matches.flatMap((match) => [
                             match.homeTeam,
                             match.awayTeam,
                           ]),
                         ),
-                      ).sort((a, b) => a.localeCompare(b));
+                      )
+                        .map((country) => ({
+                          original: country,
+                          label: getCountryLabel(country, locale),
+                        }))
+                        .sort((a, b) => {
+                          const aOrder = getTeamOrder(a.original);
+                          const bOrder = getTeamOrder(b.original);
+
+                          return aOrder - bOrder;
+                        });
 
                       return (
                         <button
@@ -413,11 +456,11 @@ export function MatchBrowser({
                           <div className="mt-4 space-y-2">
                             {countries.map((country) => (
                               <div
-                                key={country}
+                                key={country.original}
                                 className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-100"
                               >
-                                <span className="text-lg">{getFlagEmoji(country)}</span>
-                                <span>{country}</span>
+                                <span className="text-lg">{getFlagEmoji(country.original)}</span>
+                                <span>{country.label}</span>
                               </div>
                             ))}
                           </div>

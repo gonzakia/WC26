@@ -37,7 +37,7 @@ export function normalizeRoleLabel(role: string, locale: "en" | "es" = "en") {
   const normalized = role.toUpperCase();
 
   if (normalized === "OWNER") {
-    return locale === "es" ? "Dueno" : "Owner";
+    return locale === "es" ? "Dueño" : "Owner";
   }
 
   if (normalized === "MEMBER") {

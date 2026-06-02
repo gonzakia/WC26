@@ -140,6 +140,8 @@ export const translations = {
     groupForms: {
       groupName: "Group name",
       groupNamePlaceholder: "Friday Friends",
+      displayName: "Display name in this group",
+      displayNamePlaceholder: "Kiara",
       createGroup: "Create group",
       inviteCode: "Invite code",
       inviteCodePlaceholder: "WC26DE",
@@ -325,6 +327,8 @@ export const translations = {
     groupForms: {
       groupName: "Nombre del grupo",
       groupNamePlaceholder: "Amigos del viernes",
+      displayName: "Nombre en este grupo",
+      displayNamePlaceholder: "Kiara",
       createGroup: "Crear grupo",
       inviteCode: "Codigo de invitacion",
       inviteCodePlaceholder: "WC26DE",

@@ -1,4 +1,5 @@
 import { confirmMatchResult } from "@/app/actions";
+import { getCountryLabel } from "@/lib/country-labels";
 import { formatKickoff } from "@/lib/date";
 
 type ResultFormProps = {
@@ -26,6 +27,9 @@ type ResultFormProps = {
 };
 
 export function ResultForm({ match, labels, locale }: ResultFormProps) {
+  const homeTeam = getCountryLabel(match.homeTeam, locale);
+  const awayTeam = getCountryLabel(match.awayTeam, locale);
+
   return (
     <form action={confirmMatchResult} className="rounded-[1.75rem] border border-black/5 bg-sand/45 p-5">
       <input name="matchId" type="hidden" value={match.id} />
@@ -36,7 +40,7 @@ export function ResultForm({ match, labels, locale }: ResultFormProps) {
             {match.stage}
           </p>
           <h3 className="mt-2 text-2xl font-semibold text-ink">
-            {match.homeTeam} vs {match.awayTeam}
+            {homeTeam} vs {awayTeam}
           </h3>
           <p className="mt-2 text-sm text-slate-600">
             {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.venueTbd}
