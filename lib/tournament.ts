@@ -1,4 +1,4 @@
-import { formatCalendarDate, getDateKey } from "@/lib/date";
+import { formatCalendarDate } from "@/lib/date";
 
 type MatchLike = {
   id: string;
@@ -82,7 +82,11 @@ export function groupMatchesByDate<T extends MatchLike>(matches: T[], locale = "
   const map = new Map<string, { label: string; matches: T[] }>();
 
   for (const match of matches) {
-    const key = getDateKey(match.kickoffAt);
+    const key = [
+      match.kickoffAt.getFullYear(),
+      String(match.kickoffAt.getMonth() + 1).padStart(2, "0"),
+      String(match.kickoffAt.getDate()).padStart(2, "0"),
+    ].join("-");
     const existing = map.get(key);
 
     if (existing) {

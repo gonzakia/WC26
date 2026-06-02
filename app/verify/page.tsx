@@ -11,6 +11,8 @@ type VerifyPageProps = {
   searchParams: Promise<{
     email?: string;
     devCode?: string;
+    mode?: string;
+    error?: string;
   }>;
 };
 
@@ -23,7 +25,9 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
     redirect("/");
   }
 
-  const { email = "", devCode } = await searchParams;
+  const { email = "", devCode, mode, error } = await searchParams;
+  const authMode = mode === "register" ? "register" : "login";
+  const hasError = error === "no_account" || error === "account_exists";
 
   if (!email) {
     redirect("/sign-in");
@@ -48,10 +52,42 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
               {t.auth.verifyCopy}
             </p>
 
+            {error === "no_account" ? (
+              <div className="mt-6 rounded-2xl border border-black/5 bg-white p-5 text-sm leading-6 text-slate-700">
+                <p className="font-semibold text-ink">{t.auth.noAccountTitle}</p>
+                <p className="mt-1">{t.auth.noAccountCopy}</p>
+                <div className="mt-4">
+                  <Link
+                    className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                    href="/sign-in?mode=register"
+                  >
+                    {t.auth.registerNow}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            ) : null}
+
+            {error === "account_exists" ? (
+              <div className="mt-6 rounded-2xl border border-black/5 bg-white p-5 text-sm leading-6 text-slate-700">
+                <p className="font-semibold text-ink">{t.auth.accountExistsTitle}</p>
+                <p className="mt-1">{t.auth.accountExistsCopy}</p>
+                <div className="mt-4">
+                  <Link
+                    className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                    href="/sign-in?mode=login"
+                  >
+                    {t.auth.login}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            ) : null}
+
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
-                href="/sign-in"
+                href={`/sign-in?mode=${authMode}`}
               >
                 {t.auth.requestNewCode}
                 <ArrowRight className="h-4 w-4" />
@@ -60,24 +96,41 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
           </div>
 
           <SectionCard eyebrow={t.auth.codeEyebrow} title={t.auth.finishSignIn}>
-            <VerifyCodeForm
-              devCode={devCode}
-              email={email}
-              labels={{
-                email: t.auth.email,
-                emailPlaceholder: t.auth.emailPlaceholder,
-                username: t.auth.username,
-                usernamePlaceholder: t.auth.usernamePlaceholder,
-                sendCode: t.auth.sendCode,
-                verificationCode: t.auth.verificationCode,
-                verificationCodePlaceholder: t.auth.verificationCodePlaceholder,
-                developmentCode: t.auth.developmentCode,
-                verifyAndSignIn: t.auth.verifyAndSignIn,
-              }}
-            />
-            <p className="mt-4 text-sm leading-6 text-slate-600">
-              {t.auth.productionEmailNote}
-            </p>
+            {hasError ? (
+              <div className="space-y-4">
+                <p className="text-sm leading-6 text-slate-700">
+                  {error === "no_account" ? t.auth.noAccountCopy : t.auth.accountExistsCopy}
+                </p>
+                <Link
+                  className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  href={error === "no_account" ? "/sign-in?mode=register" : "/sign-in?mode=login"}
+                >
+                  {error === "no_account" ? t.auth.registerNow : t.auth.login}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            ) : (
+              <>
+                <VerifyCodeForm
+                  devCode={devCode}
+                  email={email}
+                  labels={{
+                    email: t.auth.email,
+                    emailPlaceholder: t.auth.emailPlaceholder,
+                    username: t.auth.username,
+                    usernamePlaceholder: t.auth.usernamePlaceholder,
+                    sendCode: t.auth.sendCode,
+                    verificationCode: t.auth.verificationCode,
+                    verificationCodePlaceholder: t.auth.verificationCodePlaceholder,
+                    developmentCode: t.auth.developmentCode,
+                    verifyAndSignIn: t.auth.verifyAndSignIn,
+                  }}
+                />
+                <p className="mt-4 text-sm leading-6 text-slate-600">
+                  {t.auth.productionEmailNote}
+                </p>
+              </>
+            )}
           </SectionCard>
         </div>
       </section>

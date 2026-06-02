@@ -10,6 +10,8 @@ import { getLocale, getTranslations } from "@/lib/i18n";
 type SignInPageProps = {
   searchParams: Promise<{
     mode?: string;
+    email?: string;
+    error?: string;
   }>;
 };
 
@@ -17,8 +19,10 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const user = await getCurrentUser();
   const locale = await getLocale();
   const t = getTranslations(locale);
-  const { mode } = await searchParams;
+  const { mode, email = "", error } = await searchParams;
   const authMode = mode === "register" ? "register" : "login";
+  const hasNoAccountError = error === "no_account";
+  const hasAccountExistsError = error === "account_exists";
 
   if (user) {
     redirect("/");
@@ -57,6 +61,38 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </div>
 
             <SectionCard eyebrow={t.auth.authEyebrow} title={t.auth.authCardTitle}>
+              {hasNoAccountError ? (
+                <div className="mb-4 rounded-2xl border border-black/5 bg-white p-4 text-sm leading-6 text-slate-700">
+                  <p className="font-semibold text-ink">{t.auth.noAccountTitle}</p>
+                  <p className="mt-1">{t.auth.noAccountCopy}</p>
+                  <div className="mt-3">
+                    <Link
+                      className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                      href={`/sign-in?mode=register&email=${encodeURIComponent(email)}`}
+                    >
+                      {t.auth.registerNow}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+
+              {hasAccountExistsError ? (
+                <div className="mb-4 rounded-2xl border border-black/5 bg-white p-4 text-sm leading-6 text-slate-700">
+                  <p className="font-semibold text-ink">{t.auth.accountExistsTitle}</p>
+                  <p className="mt-1">{t.auth.accountExistsCopy}</p>
+                  <div className="mt-3">
+                    <Link
+                      className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                      href={`/sign-in?mode=login&email=${encodeURIComponent(email)}`}
+                    >
+                      {t.auth.login}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+
               <AuthForm
                 labels={{
                   email: t.auth.email,
@@ -70,6 +106,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                   verifyAndSignIn: t.auth.verifyAndSignIn,
                 }}
                 mode={authMode}
+                defaultEmail={email}
               />
               <p className="mt-4 text-sm leading-6 text-slate-600">
                 {authMode === "register" ? t.auth.registerCopy : t.auth.loginCopy}

@@ -15,9 +15,11 @@ type AuthLabels = {
 export function AuthForm({
   labels,
   mode,
+  defaultEmail,
 }: {
   labels: AuthLabels;
   mode: "login" | "register";
+  defaultEmail?: string;
 }) {
   return (
     <form action={signInOrCreateUser} className="space-y-4">
@@ -30,6 +32,7 @@ export function AuthForm({
           className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-pitch-500"
           id="email"
           name="email"
+          defaultValue={defaultEmail}
           placeholder={labels.emailPlaceholder}
           required
           type="email"

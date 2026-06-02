@@ -27,7 +27,6 @@ export async function getDashboardData() {
     }),
     prisma.match.findMany({
       orderBy: { kickoffAt: "asc" },
-      take: 8,
     }),
   ]);
 

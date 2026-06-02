@@ -62,10 +62,23 @@ export async function signInOrCreateUser(formData: FormData) {
     throw new Error("Username is required.");
   }
 
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (intent === "login" && !existingUser) {
+    redirect(`/sign-in?mode=login&email=${encodeURIComponent(email)}&error=no_account`);
+  }
+
+  if (intent === "register" && existingUser) {
+    redirect(`/sign-in?mode=register&email=${encodeURIComponent(email)}&error=account_exists`);
+  }
+
   const { code, emailSent } = await createLoginCode(email, displayName);
 
   const params = new URLSearchParams({
     email,
+    mode: intent === "register" ? "register" : "login",
   });
 
   if (!emailSent || !canSendEmail()) {
