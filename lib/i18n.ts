@@ -297,7 +297,7 @@ export const translations = {
       create: "Crear",
       startPrivateGroup: "Crea un nuevo grupo privado",
       join: "Unirse",
-      enterInviteCode: "Ingresa un código de invitación",
+      enterInviteCode: "Ingresa el código de tu grupo",
       users: "Usuarios",
       usersTitle: "Las personas crean o se unen a grupos privados",
       usersCopy:
