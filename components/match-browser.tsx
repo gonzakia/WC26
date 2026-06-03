@@ -8,7 +8,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import { PredictionForm } from "@/components/prediction-form";
-import { getCountryLabel } from "@/lib/country-labels";
+import { getCountryFlag, getCountryLabel } from "@/lib/country-labels";
 import {
   getKnockoutStageOrder,
   groupKnockoutMatchesByRound,
@@ -202,12 +202,13 @@ function MatchItem({
               </span>
             ) : null}
           </div>
-          <h3 className="mt-3 text-2xl font-semibold text-ink">
-            {homeTeam} vs {awayTeam}
-          </h3>
           <p className="mt-2 text-sm text-slate-600">
             {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.common.venueTbd}
           </p>
+          <h3 className="mt-3 text-2xl font-semibold text-ink">
+            {homeTeam} vs {awayTeam}
+          </h3>
+          
           {match.resultConfirmed ? (
             <p className="mt-3 text-sm font-medium text-pitch-800">
               {labels.common.finalScore}: {match.homeScore} - {match.awayScore}
@@ -222,9 +223,12 @@ function MatchItem({
 
       <div className="mt-5">
         <PredictionForm
+          awayTeam={match.awayTeam}
           defaultAway={prediction?.predictedAway}
           defaultHome={prediction?.predictedHome}
           groupId={groupId}
+          homeTeam={match.homeTeam}
+          locale={locale}
           locked={locked}
           labels={{
             home: labels.common.home,
@@ -459,7 +463,7 @@ export function MatchBrowser({
                                 key={country.original}
                                 className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-100"
                               >
-                                <span className="text-lg">{getFlagEmoji(country.original)}</span>
+                                <span className="text-lg">{getCountryFlag(country.original)}</span>
                                 <span>{country.label}</span>
                               </div>
                             ))}

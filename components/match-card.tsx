@@ -52,12 +52,13 @@ export function MatchCard({ match, groupId, prediction, labels }: MatchCardProps
               </span>
             ) : null}
           </div>
-          <h3 className="mt-3 text-2xl font-semibold text-ink">
-            {match.homeTeam} vs {match.awayTeam}
-          </h3>
           <p className="mt-2 text-sm text-slate-600">
             {formatKickoff(match.kickoffAt)} · {match.venue ?? "Venue TBD"}
           </p>
+          <h3 className="mt-3 text-2xl font-semibold text-ink">
+            {match.homeTeam} vs {match.awayTeam}
+          </h3>
+          
           {match.resultConfirmed ? (
             <p className="mt-3 text-sm font-medium text-pitch-800">
               Final score: {match.homeScore} - {match.awayScore}
@@ -72,9 +73,11 @@ export function MatchCard({ match, groupId, prediction, labels }: MatchCardProps
 
       <div className="mt-5">
         <PredictionForm
+          awayTeam={match.awayTeam}
           defaultAway={prediction?.predictedAway}
           defaultHome={prediction?.predictedHome}
           groupId={groupId}
+          homeTeam={match.homeTeam}
           locked={locked}
           labels={mergedLabels}
           matchId={match.id}

@@ -54,11 +54,86 @@ const COUNTRY_LABELS_ES: Record<string, string> = {
   uzbekistan: "Uzbekistán",
 };
 
+const FLAG_EMOJIS: Record<string, string> = {
+  algeria: "🇩🇿",
+  argentina: "🇦🇷",
+  australia: "🇦🇺",
+  austria: "🇦🇹",
+  belgium: "🇧🇪",
+  "bosnia-herzegovina": "🇧🇦",
+  "bosnia and herzegovina": "🇧🇦",
+  brazil: "🇧🇷",
+  canada: "🇨🇦",
+  "cape verde": "🇨🇻",
+  "cape verde islands": "🇨🇻",
+  colombia: "🇨🇴",
+  "congo dr": "🇨🇩",
+  croatia: "🇭🇷",
+  curaçao: "🇨🇼",
+  czechia: "🇨🇿",
+  ecuador: "🇪🇨",
+  egypt: "🇪🇬",
+  england: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+  france: "🇫🇷",
+  germany: "🇩🇪",
+  ghana: "🇬🇭",
+  haiti: "🇭🇹",
+  iran: "🇮🇷",
+  iraq: "🇮🇶",
+  "ivory coast": "🇨🇮",
+  "cote d'ivoire": "🇨🇮",
+  "côte d'ivoire": "🇨🇮",
+  japan: "🇯🇵",
+  jordan: "🇯🇴",
+  mexico: "🇲🇽",
+  morocco: "🇲🇦",
+  netherlands: "🇳🇱",
+  "new zealand": "🇳🇿",
+  norway: "🇳🇴",
+  panama: "🇵🇦",
+  paraguay: "🇵🇾",
+  portugal: "🇵🇹",
+  qatar: "🇶🇦",
+  "saudi arabia": "🇸🇦",
+  scotland: "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  senegal: "🇸🇳",
+  "south africa": "🇿🇦",
+  "south korea": "🇰🇷",
+  spain: "🇪🇸",
+  sweden: "🇸🇪",
+  switzerland: "🇨🇭",
+  tunisia: "🇹🇳",
+  turkey: "🇹🇷",
+  uruguay: "🇺🇾",
+  "united states": "🇺🇸",
+  "united states of america": "🇺🇸",
+  usa: "🇺🇸",
+  uzbekistan: "🇺🇿",
+};
+
+function normalizeCountryName(teamName: string) {
+  return teamName.trim().toLowerCase();
+}
+
 export function getCountryLabel(teamName: string, locale: string) {
   if (!locale.startsWith("es")) {
     return teamName;
   }
 
-  const normalized = teamName.trim().toLowerCase();
+  const normalized = normalizeCountryName(teamName);
   return COUNTRY_LABELS_ES[normalized] ?? teamName;
+}
+
+export function getCountryFlag(teamName: string) {
+  const normalized = normalizeCountryName(teamName);
+
+  if (FLAG_EMOJIS[normalized]) {
+    return FLAG_EMOJIS[normalized];
+  }
+
+  const matchedKey = Object.keys(FLAG_EMOJIS).find((key) =>
+    normalized.includes(key),
+  );
+
+  return matchedKey ? FLAG_EMOJIS[matchedKey] : "🏳️";
 }
