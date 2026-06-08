@@ -35,7 +35,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
 
   return (
     <main className="relative min-h-screen overflow-hidden">
-      <div className="absolute inset-0 bg-grid bg-[size:42px_42px] opacity-20" />
+      <div className="pointer-events-none absolute inset-0 bg-grid bg-[size:42px_42px] opacity-20" />
       <section className="mx-auto flex min-h-screen max-w-6xl items-center px-6 py-16 lg:px-10">
         <div className="grid w-full gap-10 lg:grid-cols-[1fr_0.9fr]">
           <div>

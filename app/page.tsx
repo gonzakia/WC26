@@ -22,7 +22,7 @@ export default async function Home() {
   if (!sessionUser) {
     return (
       <main className="relative min-h-screen overflow-hidden">
-        <div className="absolute inset-0 bg-grid bg-[size:42px_42px] opacity-15" />
+        <div className="pointer-events-none absolute inset-0 bg-grid bg-[size:42px_42px] opacity-15" />
         <section className="mx-auto flex min-h-screen max-w-4xl flex-col px-6 py-8 lg:px-10">
           <div className="flex justify-end">
             <SettingsMenu currentLocale={locale} labels={t.settings} />
@@ -71,7 +71,7 @@ export default async function Home() {
 
   return (
     <main className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid bg-[size:42px_42px] opacity-20" />
+      <div className="pointer-events-none absolute inset-0 bg-grid bg-[size:42px_42px] opacity-20" />
 
       <section className="mx-auto flex min-h-screen max-w-7xl flex-col px-6 pb-16 pt-8 lg:px-10">
         <header className="flex flex-col gap-4 border-b border-ink/10 pb-5 sm:flex-row sm:items-center sm:justify-between">

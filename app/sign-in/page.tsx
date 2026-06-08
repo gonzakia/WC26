@@ -30,7 +30,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
   return (
     <main className="relative min-h-screen overflow-hidden">
-      <div className="absolute inset-0 bg-grid bg-[size:42px_42px] opacity-15" />
+      <div className="pointer-events-none absolute inset-0 bg-grid bg-[size:42px_42px] opacity-15" />
       <section className="mx-auto flex min-h-screen max-w-4xl items-center px-6 py-8 lg:px-10">
         <div className="w-full">
           <div className="mb-8 flex justify-end">
