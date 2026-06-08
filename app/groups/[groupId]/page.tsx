@@ -76,8 +76,8 @@ export default async function GroupPage({ params }: GroupPageProps) {
           </div>
         </section>
 
-        <section className="mt-8 grid gap-8 lg:grid-cols-[1.35fr_0.65fr]">
-          <div className="rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">
+        <section className="mt-8 grid min-w-0 gap-8 lg:grid-cols-[1.35fr_0.65fr]">
+          <div className="min-w-0 rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
               {t.groupPage.matches}
             </p>

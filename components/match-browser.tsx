@@ -279,8 +279,8 @@ export function MatchBrowser({
   );
 
   return (
-    <div className="mt-6 space-y-6">
-      <section className="overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#0d1f17] text-white">
+    <div className="mt-6 min-w-0 space-y-6">
+      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#0d1f17] text-white">
         <button
           className="flex w-full items-center justify-between px-5 py-4 text-left"
           onClick={() => setOpenPrimary(openPrimary === "date" ? "stage" : "date")}
@@ -301,22 +301,24 @@ export function MatchBrowser({
         </button>
 
         {openPrimary === "date" ? (
-          <div className="border-t border-white/10 px-5 pb-5 pt-4">
-            <div className="flex flex-wrap gap-3">
-              {dates.map((section) => (
-                <button
-                  key={section.key}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    openDateKey === section.key
-                      ? "bg-white text-ink"
-                      : "bg-white/10 text-white hover:bg-white/20"
-                  }`}
-                  onClick={() => setOpenDateKey(section.key)}
-                  type="button"
-                >
-                  {section.label}
-                </button>
-              ))}
+          <div className="min-w-0 border-t border-white/10 px-5 pb-5 pt-4">
+            <div className="w-full min-w-0 overflow-x-auto pb-1">
+              <div className="flex flex-nowrap gap-3">
+                {dates.map((section) => (
+                  <button
+                    key={section.key}
+                    className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      openDateKey === section.key
+                        ? "bg-white text-ink"
+                        : "bg-white/10 text-white hover:bg-white/20"
+                    }`}
+                    onClick={() => setOpenDateKey(section.key)}
+                    type="button"
+                  >
+                    {section.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="mt-5 space-y-5">
@@ -339,7 +341,7 @@ export function MatchBrowser({
         ) : null}
       </section>
 
-      <section className="overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#10261b] text-white">
+      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#10261b] text-white">
         <button
           className="flex w-full items-center justify-between px-5 py-4 text-left"
           onClick={() => setOpenPrimary(openPrimary === "stage" ? "date" : "stage")}
