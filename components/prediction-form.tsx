@@ -1,6 +1,7 @@
 "use client";
 
-import { savePrediction } from "@/app/actions";
+import { useActionState, useEffect, useState } from "react";
+import { savePredictionWithFeedback } from "@/app/actions";
 import { getCountryFlag, getCountryLabel } from "@/lib/country-labels";
 
 type PredictionFormProps = {
@@ -16,6 +17,8 @@ type PredictionFormProps = {
     home: string;
     away: string;
     savePick: string;
+    savingPick?: string;
+    savedPick?: string;
     locked: string;
   };
 };
@@ -31,13 +34,30 @@ export function PredictionForm({
   locked,
   labels,
 }: PredictionFormProps) {
+  const [state, formAction, isPending] = useActionState(savePredictionWithFeedback, {
+    savedAt: 0,
+  });
+  const [showSaved, setShowSaved] = useState(false);
   const homeLabel = getCountryLabel(homeTeam, locale);
   const awayLabel = getCountryLabel(awayTeam, locale);
   const homeInputId = `${matchId}-predicted-home`;
   const awayInputId = `${matchId}-predicted-away`;
 
+  useEffect(() => {
+    if (!state.savedAt) {
+      return;
+    }
+
+    setShowSaved(true);
+    const timer = window.setTimeout(() => {
+      setShowSaved(false);
+    }, 2500);
+
+    return () => window.clearTimeout(timer);
+  }, [state.savedAt]);
+
   return (
-    <form action={savePrediction} className="flex flex-wrap items-end gap-3">
+    <form action={formAction} className="flex flex-wrap items-end gap-3">
       <input name="groupId" type="hidden" value={groupId} />
       <input name="matchId" type="hidden" value={matchId} />
 
@@ -87,11 +107,23 @@ export function PredictionForm({
 
       <button
         className="inline-flex rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
-        disabled={locked}
+        disabled={locked || isPending}
         type="submit"
       >
-        {locked ? labels.locked : labels.savePick}
+        {locked
+          ? labels.locked
+          : isPending
+            ? labels.savingPick ?? "Saving..."
+            : labels.savePick}
       </button>
+      <span
+        aria-live="polite"
+        className={`rounded-full bg-pitch-50 px-3 py-2 text-xs font-semibold text-pitch-900 shadow-sm transition ${
+          showSaved ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        {labels.savedPick ?? "Saved"}
+      </span>
     </form>
   );
 }

@@ -307,6 +307,21 @@ export async function savePrediction(formData: FormData) {
   revalidatePath(`/groups/${groupId}`);
 }
 
+type PredictionSaveState = {
+  savedAt: number;
+};
+
+export async function savePredictionWithFeedback(
+  _state: PredictionSaveState,
+  formData: FormData,
+) {
+  await savePrediction(formData);
+
+  return {
+    savedAt: Date.now(),
+  };
+}
+
 export async function syncWorldCupData() {
   await requireCurrentUser();
   await syncWorldCupMatches();

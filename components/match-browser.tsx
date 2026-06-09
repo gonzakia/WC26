@@ -48,6 +48,8 @@ type MatchBrowserProps = {
       home: string;
       away: string;
       savePick: string;
+      savingPick: string;
+      savedPick: string;
       locked: string;
       open: string;
     };
@@ -244,6 +246,8 @@ function MatchItem({
             home: labels.common.home,
             away: labels.common.away,
             savePick: labels.common.savePick,
+            savingPick: labels.common.savingPick,
+            savedPick: labels.common.savedPick,
             locked: labels.common.locked,
           }}
           matchId={match.id}

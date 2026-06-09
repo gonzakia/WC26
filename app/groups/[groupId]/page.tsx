@@ -76,7 +76,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
           </div>
         </section>
 
-        <section className="mt-8 grid min-w-0 gap-8 lg:grid-cols-[1.35fr_0.65fr]">
+        <section className="mt-8 grid min-w-0 gap-8 lg:grid-cols-[1.25fr_0.75fr]">
           <div className="min-w-0 rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
               {t.groupPage.matches}
@@ -94,6 +94,8 @@ export default async function GroupPage({ params }: GroupPageProps) {
                   home: t.common.home,
                   away: t.common.away,
                   savePick: t.common.savePick,
+                  savingPick: t.common.savingPick,
+                  savedPick: t.common.savedPick,
                   locked: t.common.locked,
                   open: t.common.open,
                 },
@@ -116,7 +118,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
             </h2>
 
             <div className="mt-6 overflow-hidden rounded-3xl border border-black/5">
-              <div className="grid grid-cols-[0.55fr_1.8fr_1fr_1fr_1fr] bg-ink px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">
+              <div className="grid grid-cols-[0.55fr_1.5fr_0.8fr_1fr_0.8fr] bg-ink px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-200">
                 <span>#</span>
                 <span>{t.groupPage.player}</span>
                 <span>{t.groupPage.exact}</span>

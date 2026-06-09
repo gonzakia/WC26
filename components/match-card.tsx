@@ -23,6 +23,8 @@ type MatchCardProps = {
     home: string;
     away: string;
     savePick: string;
+    savingPick?: string;
+    savedPick?: string;
     locked: string;
   };
 };
@@ -31,6 +33,8 @@ const defaultLabels = {
   home: "Home",
   away: "Away",
   savePick: "Save pick",
+  savingPick: "Saving...",
+  savedPick: "Saved",
   locked: "Locked",
 };
 

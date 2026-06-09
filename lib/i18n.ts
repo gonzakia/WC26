@@ -33,6 +33,8 @@ export const translations = {
       home: "Home",
       away: "Away",
       savePick: "Save pick",
+      savingPick: "Saving...",
+      savedPick: "Saved",
     },
     auth: {
       appName: "WC26 Predictions",
@@ -234,6 +236,8 @@ export const translations = {
       home: "Local",
       away: "Visitante",
       savePick: "Guardar predicción",
+      savingPick: "Guardando...",
+      savedPick: "Guardada",
     },
     auth: {
       appName: "WC26 Predictions",
