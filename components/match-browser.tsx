@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { PredictionForm } from "@/components/prediction-form";
 import { getCountryFlag, getCountryLabel } from "@/lib/country-labels";
+import { getMatchVenue } from "@/lib/manual-venues";
 import { isPredictionLocked } from "@/lib/prediction-deadlines";
 import {
   getKnockoutStageOrder,
@@ -20,6 +21,8 @@ import {
 
 type BrowserMatch = {
   id: string;
+  externalMatchId?: string | null;
+  slug?: string;
   stage: string;
   groupName?: string | null;
   kickoffAt: string;
@@ -198,6 +201,7 @@ function MatchItem({
   );
   const homeTeam = getCountryLabel(match.homeTeam, locale);
   const awayTeam = getCountryLabel(match.awayTeam, locale);
+  const venue = getMatchVenue(match, locale);
 
   return (
     <div className="rounded-[1.75rem] border border-black/5 bg-pitch-200/100 p-5">
@@ -213,10 +217,10 @@ function MatchItem({
               </span>
             ) : null}
           </div>
-          {/*<p className="mt-2 text-sm text-slate-600">
-            {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.common.venueTbd}
+          <p className="mt-2 text-sm text-slate-600">
+            {formatKickoff(match.kickoffAt, locale)}
+            {venue ? <> · {venue}</> : null}
           </p>
-          */}
           <h3 className="mt-3 text-2xl font-semibold text-ink">
             {homeTeam} vs {awayTeam}
           </h3>

@@ -1,9 +1,12 @@
 import { PredictionForm } from "@/components/prediction-form";
 import { formatKickoff } from "@/lib/date";
+import { getMatchVenue } from "@/lib/manual-venues";
 
 type MatchCardProps = {
   match: {
     id: string;
+    externalMatchId?: string | null;
+    slug?: string;
     stage: string;
     groupName?: string | null;
     kickoffAt: Date;
@@ -41,6 +44,7 @@ const defaultLabels = {
 export function MatchCard({ match, groupId, prediction, labels }: MatchCardProps) {
   const locked = match.kickoffAt <= new Date();
   const mergedLabels = labels ?? defaultLabels;
+  const venue = getMatchVenue(match, "en-US");
 
   return (
     <div className="rounded-[1.75rem] border border-black/5 bg-sand/50 p-5">
@@ -57,7 +61,8 @@ export function MatchCard({ match, groupId, prediction, labels }: MatchCardProps
             ) : null}
           </div>
           <p className="mt-2 text-sm text-slate-600">
-            {formatKickoff(match.kickoffAt)} · {match.venue ?? "Venue TBD"}
+            {formatKickoff(match.kickoffAt)}
+            {venue ? <> · {venue}</> : null}
           </p>
           <h3 className="mt-3 text-2xl font-semibold text-ink">
             {match.homeTeam} vs {match.awayTeam}

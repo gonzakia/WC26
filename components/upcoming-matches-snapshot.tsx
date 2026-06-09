@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { Clock3, MapPin } from "lucide-react";
 import { getCountryLabel } from "@/lib/country-labels";
 import { formatKickoff } from "@/lib/date";
+import { getMatchVenue } from "@/lib/manual-venues";
 import { normalizeStageLabel } from "@/lib/tournament";
 
 type UpcomingMatch = {
   id: string;
+  externalMatchId?: string | null;
+  slug?: string;
   kickoffAt: string;
   stage: string;
   venue: string | null;
@@ -173,10 +176,12 @@ export function UpcomingMatchesSnapshot({
                               timeZone,
                             )}
                           </span>
-                          {/*<span className="inline-flex items-center gap-1">
-                            <MapPin className="h-3.5 w-3.5" />
-                            {match.venue ?? labels.venueTbd}
-                          </span>*/}
+                          {getMatchVenue(match, locale) ? (
+                            <span className="inline-flex items-center gap-1">
+                              <MapPin className="h-3.5 w-3.5" />
+                              {getMatchVenue(match, locale)}
+                            </span>
+                          ) : null}
                         </div>
                       </div>
 
