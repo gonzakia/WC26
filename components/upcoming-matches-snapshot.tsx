@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Clock3, MapPin } from "lucide-react";
 import { getCountryLabel } from "@/lib/country-labels";
 import { formatKickoff } from "@/lib/date";
@@ -5,11 +8,15 @@ import { normalizeStageLabel } from "@/lib/tournament";
 
 type UpcomingMatch = {
   id: string;
-  kickoffAt: Date;
+  kickoffAt: string;
   stage: string;
   venue: string | null;
   homeTeam: string;
   awayTeam: string;
+};
+
+type NormalizedUpcomingMatch = Omit<UpcomingMatch, "kickoffAt"> & {
+  kickoffAt: Date;
 };
 
 type UpcomingMatchesSnapshotProps = {
@@ -27,18 +34,35 @@ type UpcomingMatchesSnapshotProps = {
   };
 };
 
-function getLocalDateKey(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
-    date.getDate(),
-  ).padStart(2, "0")}`;
+function getLocalDateKey(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone,
+    year: "numeric",
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
 }
 
-function getDayLabel(date: Date, now: Date, locale: string, labels: UpcomingMatchesSnapshotProps["labels"]) {
-  const todayKey = getLocalDateKey(now);
+function getDayLabel(
+  date: Date,
+  now: Date,
+  locale: string,
+  labels: UpcomingMatchesSnapshotProps["labels"],
+  timeZone: string,
+) {
+  const todayKey = getLocalDateKey(now, timeZone);
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowKey = getLocalDateKey(tomorrow);
-  const dateKey = getLocalDateKey(date);
+  const tomorrowKey = getLocalDateKey(tomorrow, timeZone);
+  const dateKey = getLocalDateKey(date, timeZone);
 
   if (dateKey === todayKey) {
     return labels.today;
@@ -52,6 +76,7 @@ function getDayLabel(date: Date, now: Date, locale: string, labels: UpcomingMatc
     weekday: "short",
     month: "short",
     day: "numeric",
+    timeZone,
   }).format(date);
 }
 
@@ -60,26 +85,36 @@ export function UpcomingMatchesSnapshot({
   locale,
   labels,
 }: UpcomingMatchesSnapshotProps) {
+  const [timeZone, setTimeZone] = useState("UTC");
+
+  useEffect(() => {
+    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
+
   const now = new Date();
-  const todayKey = getLocalDateKey(now);
+  const normalizedMatches = matches.map((match) => ({
+    ...match,
+    kickoffAt: new Date(match.kickoffAt),
+  }));
+  const todayKey = getLocalDateKey(now, timeZone);
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowKey = getLocalDateKey(tomorrow);
+  const tomorrowKey = getLocalDateKey(tomorrow, timeZone);
 
-  const dayWindowMatches = matches.filter((match) => {
-    const matchKey = getLocalDateKey(match.kickoffAt);
+  const dayWindowMatches = normalizedMatches.filter((match) => {
+    const matchKey = getLocalDateKey(match.kickoffAt, timeZone);
     return matchKey === todayKey || matchKey === tomorrowKey;
   });
 
   const futureMatches =
     dayWindowMatches.length > 0
       ? dayWindowMatches
-      : matches.filter((match) => match.kickoffAt >= now).slice(0, 6);
+      : normalizedMatches.filter((match) => match.kickoffAt >= now).slice(0, 6);
 
   const groupedMatches = futureMatches.reduce<
-    Array<{ label: string; matches: UpcomingMatch[] }>
+    Array<{ label: string; matches: NormalizedUpcomingMatch[] }>
   >((groups, match) => {
-    const label = getDayLabel(match.kickoffAt, now, locale, labels);
+    const label = getDayLabel(match.kickoffAt, now, locale, labels, timeZone);
     const existing = groups[groups.length - 1];
 
     if (existing && existing.label === label) {
@@ -99,9 +134,7 @@ export function UpcomingMatchesSnapshot({
             {labels.snapshot}
           </p>
           <h2 className="mt-2 text-2xl font-semibold">{labels.upcomingMatches}</h2>
-          <p className="mt-2 max-w-sm text-sm leading-6 text-slate-300">
-            {labels.snapshotCopy}
-          </p>
+
         </div>
 
         <div className="rounded-full bg-white/10 px-4 py-2 text-sm text-pitch-100">
@@ -134,7 +167,11 @@ export function UpcomingMatchesSnapshot({
                         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-300">
                           <span className="inline-flex items-center gap-1">
                             <Clock3 className="h-3.5 w-3.5" />
-                            {formatKickoff(match.kickoffAt, locale === "es" ? "es-ES" : "en-US")}
+                            {formatKickoff(
+                              match.kickoffAt,
+                              locale === "es" ? "es-ES" : "en-US",
+                              timeZone,
+                            )}
                           </span>
                           <span className="inline-flex items-center gap-1">
                             <MapPin className="h-3.5 w-3.5" />

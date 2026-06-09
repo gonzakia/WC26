@@ -110,7 +110,7 @@ export const translations = {
       create: "Create",
       startPrivateGroup: "Start a new private group",
       join: "Join",
-      enterInviteCode: "Enter an invite code",
+      enterInviteCode: "Enter a group's invite code to join",
       users: "Users",
       usersTitle: "People create or join private groups",
       usersCopy:
@@ -155,7 +155,7 @@ export const translations = {
       leaderboard: "Leaderboard",
       leaderboardTitle: "Live standings for this group",
       leaderboardCopy:
-        "Points are computed from stored predictions and confirmed match results. Until results are entered, the leaderboard stays at zero.",
+        "Score 3 points for an exact score, 1 point for the correct winner or draw, and 0 points if the outcome is wrong.",
       members: "Members",
       inviteCode: "Invite code",
       player: "Player",
@@ -330,7 +330,7 @@ export const translations = {
       displayName: "Nombre en este grupo",
       displayNamePlaceholder: "Kiara",
       createGroup: "Crear grupo",
-      inviteCode: "código de invitacion",
+      inviteCode: "Código de invitacion",
       inviteCodePlaceholder: "WC26DE",
       joinGroup: "Unirse al grupo",
     },
@@ -342,7 +342,7 @@ export const translations = {
       leaderboard: "Clasificacion",
       leaderboardTitle: "Tabla en vivo de este grupo",
       leaderboardCopy:
-        "Los puntos se calculan con predicciones guardadas y resultados confirmados. Hasta que entren resultados, la tabla se mantiene en cero.",
+        "Gana 3 puntos por acertar el marcador exacto, 1 punto por acertar el ganador o empate y 0 puntos si el resultado es incorrecto.",
       members: "Miembros",
       inviteCode: "código de invitacion",
       player: "Jugador",

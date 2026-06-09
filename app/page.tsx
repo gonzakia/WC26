@@ -135,7 +135,10 @@ export default async function Home() {
           </section>
 
           <UpcomingMatchesSnapshot
-            matches={matches}
+            matches={matches.map((match) => ({
+              ...match,
+              kickoffAt: match.kickoffAt.toISOString(),
+            }))}
             locale={locale}
             labels={{
               snapshot: t.home.snapshot,
