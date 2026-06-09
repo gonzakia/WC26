@@ -1,10 +1,11 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 export const locales = ["en", "es"] as const;
 export type Locale = (typeof locales)[number];
 
 const defaultLocale: Locale = "en";
 const localeCookieName = "wc26_locale";
+const localeHeaderName = "x-wc26-locale";
 
 export const translations = {
   en: {
@@ -99,6 +100,20 @@ export const translations = {
       today: "Today",
       tomorrow: "Tomorrow",
       noUpcomingMatches: "No upcoming matches right now.",
+      rulesEyebrow: "Rules",
+      rulesTitle: "How predictions work",
+      rulesIntro:
+        "Make one score prediction per match inside each private group before that prediction locks.",
+      exactScoreRule: "Exact score",
+      exactScoreRuleCopy: "Get the final score exactly right for 3 points.",
+      outcomeRule: "Correct outcome",
+      outcomeRuleCopy: "Pick the right winner or draw for 1 point if the score is not exact.",
+      deadlineRule: "Prediction deadlines",
+      deadlineRuleCopy:
+        "Group-stage picks lock when that group's first match starts. Knockout picks lock at the kickoff of each individual match.",
+      separateGroupsRule: "Separate groups",
+      separateGroupsRuleCopy:
+        "If you join more than one group, enter predictions in each group separately. Your picks can be different from group to group.",
       groups: "Groups",
       privateLeagues: "Private groups",
       scoring: "Scoring",
@@ -277,7 +292,7 @@ export const translations = {
       heroTitle: "Haz predicciones del Mundial con amigos y clasifica cada resultado.",
       heroCopy:
         "Este proyecto esta pensado para tu idea: los usuarios se unen a un grupo, envian predicciones antes del inicio, ganan puntos por acertar el marcador o el resultado y suben en una tabla compartida.",
-      openDashboard: "Abrir panel",
+      openDashboard: "Ir a mis grupos",
       sampleLeaderboard: "Ver tabla de ejemplo",
       enterResults: "Ingresar resultados",
       snapshot: "Resumen de jornada",
@@ -286,6 +301,20 @@ export const translations = {
       today: "Hoy",
       tomorrow: "Mañana",
       noUpcomingMatches: "No hay partidos próximos por ahora.",
+      rulesEyebrow: "Reglas",
+      rulesTitle: "Cómo funcionan las predicciones",
+      rulesIntro:
+        "Haz una predicción de marcador por partido dentro de cada grupo privado antes de que se cierre.",
+      exactScoreRule: "Marcador exacto",
+      exactScoreRuleCopy: "Acertar el marcador final exacto vale 3 puntos.",
+      outcomeRule: "Resultado correcto",
+      outcomeRuleCopy: "Acertar el ganador o empate vale 1 punto si el marcador no es exacto.",
+      deadlineRule: "Cierres de predicción",
+      deadlineRuleCopy:
+        "En fase de grupos, las predicciones se cierran cuando empieza el primer partido de ese grupo. En rondas finales, cada partido se cierra en su propio inicio.",
+      separateGroupsRule: "Grupos separados",
+      separateGroupsRuleCopy:
+        "Si estás en más de un grupo, debes ingresar tus predicciones en cada grupo por separado. Pueden ser diferentes entre grupos.",
       groups: "Grupos",
       privateLeagues: "Grupos privados",
       scoring: "Puntuación",
@@ -384,6 +413,13 @@ export const translations = {
 } as const;
 
 export async function getLocale(): Promise<Locale> {
+  const requestHeaders = await headers();
+  const headerValue = requestHeaders.get(localeHeaderName);
+
+  if (locales.includes(headerValue as Locale)) {
+    return headerValue as Locale;
+  }
+
   const cookieStore = await cookies();
   const value = cookieStore.get(localeCookieName)?.value;
   return locales.includes(value as Locale) ? (value as Locale) : defaultLocale;
@@ -395,4 +431,30 @@ export function getTranslations(locale: Locale) {
 
 export function getLocaleCookieName() {
   return localeCookieName;
+}
+
+export function getLocaleHeaderName() {
+  return localeHeaderName;
+}
+
+export function stripLocalePrefix(pathname: string) {
+  const parts = pathname.split("/");
+  const maybeLocale = parts[1];
+
+  if (!locales.includes(maybeLocale as Locale)) {
+    return pathname || "/";
+  }
+
+  const stripped = `/${parts.slice(2).join("/")}`;
+  return stripped === "/" ? "/" : stripped.replace(/\/$/, "");
+}
+
+export function localizePath(pathname: string, locale: Locale) {
+  const stripped = stripLocalePrefix(pathname);
+
+  if (locale === defaultLocale) {
+    return stripped;
+  }
+
+  return stripped === "/" ? `/${locale}` : `/${locale}${stripped}`;
 }

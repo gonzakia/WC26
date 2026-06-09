@@ -5,7 +5,7 @@ import { SignOutButton } from "@/components/auth-forms";
 import { MatchBrowser } from "@/components/match-browser";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getGroupPageData } from "@/lib/data";
-import { getLocale, getTranslations } from "@/lib/i18n";
+import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
 import { normalizeRoleLabel } from "@/lib/tournament";
 
 type GroupPageProps = {
@@ -32,7 +32,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-ink"
-            href="/"
+            href={localizePath("/", locale)}
           >
             <ChevronLeft className="h-4 w-4" />
             {t.common.backDashboard}

@@ -131,11 +131,19 @@ export function EmptyGroupsState({ labels }: { labels: GroupFormLabels }) {
   );
 }
 
-export function GroupLink({ groupId, label }: { groupId: string; label: string }) {
+export function GroupLink({
+  groupId,
+  href,
+  label,
+}: {
+  groupId: string;
+  href?: string;
+  label: string;
+}) {
   return (
     <Link
       className="inline-flex items-center rounded-full bg-pitch-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-pitch-800"
-      href={`/groups/${groupId}`}
+      href={href ?? `/groups/${groupId}`}
     >
       {label}
     </Link>

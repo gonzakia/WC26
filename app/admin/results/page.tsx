@@ -5,7 +5,7 @@ import { requireCurrentUser } from "@/lib/auth";
 import { ResultForm } from "@/components/result-form";
 import { SettingsMenu } from "@/components/settings-menu";
 import { SyncWorldCupButton } from "@/components/sync-controls";
-import { getLocale, getTranslations } from "@/lib/i18n";
+import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminResultsPage() {
@@ -35,7 +35,7 @@ export default async function AdminResultsPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-ink"
-            href="/"
+            href={localizePath("/", locale)}
           >
             <ChevronLeft className="h-4 w-4" />
             {t.common.backDashboard}

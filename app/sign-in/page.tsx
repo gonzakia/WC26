@@ -5,7 +5,7 @@ import { AuthForm } from "@/components/auth-forms";
 import { SectionCard } from "@/components/section-card";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getCurrentUser } from "@/lib/auth";
-import { getLocale, getTranslations } from "@/lib/i18n";
+import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
 
 type SignInPageProps = {
   searchParams: Promise<{
@@ -25,7 +25,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const hasAccountExistsError = error === "account_exists";
 
   if (user) {
-    redirect("/");
+    redirect(localizePath("/", locale));
   }
 
   return (
@@ -52,7 +52,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
-                  href="/"
+                  href={localizePath("/", locale)}
                 >
                   {t.common.backHome}
                   <ArrowRight className="h-4 w-4" />
@@ -68,7 +68,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                   <div className="mt-3">
                     <Link
                       className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-                      href={`/sign-in?mode=register&email=${encodeURIComponent(email)}`}
+                      href={`${localizePath("/register", locale)}?email=${encodeURIComponent(email)}`}
                     >
                       {t.auth.registerNow}
                       <ArrowRight className="h-4 w-4" />
@@ -84,7 +84,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                   <div className="mt-3">
                     <Link
                       className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-                      href={`/sign-in?mode=login&email=${encodeURIComponent(email)}`}
+                      href={`${localizePath("/sign-in", locale)}?email=${encodeURIComponent(email)}`}
                     >
                       {t.auth.login}
                       <ArrowRight className="h-4 w-4" />
@@ -114,7 +114,11 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
               <div className="mt-4">
                 <Link
                   className="text-sm font-medium text-pitch-800 underline underline-offset-4"
-                  href={authMode === "register" ? "/sign-in?mode=login" : "/sign-in?mode=register"}
+                  href={
+                    authMode === "register"
+                      ? localizePath("/sign-in", locale)
+                      : localizePath("/register", locale)
+                  }
                 >
                   {authMode === "register" ? t.auth.switchToLogin : t.auth.switchToRegister}
                 </Link>

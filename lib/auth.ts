@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { canSendEmail, sendSignInCodeEmail } from "@/lib/email";
+import { getLocale, localizePath } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 
 const SESSION_COOKIE = "wc26_session";
@@ -171,7 +172,7 @@ export async function requireCurrentUser() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/sign-in");
+    redirect(localizePath("/sign-in", await getLocale()));
   }
 
   return user;

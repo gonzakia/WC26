@@ -12,7 +12,7 @@ import {
 import { UpcomingMatchesSnapshot } from "@/components/upcoming-matches-snapshot";
 import { getDashboardData } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
-import { getLocale, getTranslations } from "@/lib/i18n";
+import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
 
 export default async function Home() {
   const locale = await getLocale();
@@ -43,7 +43,7 @@ export default async function Home() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-slate-800"
-                  href="/sign-in?mode=register"
+                  href={localizePath("/register", locale)}
                 >
                   {t.home.register}
                   <ArrowRight className="h-4 w-4" />
@@ -51,7 +51,7 @@ export default async function Home() {
 
                 <Link
                   className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
-                  href="/sign-in?mode=login"
+                  href={localizePath("/sign-in", locale)}
                 >
                   {t.home.login}
                   <ArrowRight className="h-4 w-4" />
@@ -94,14 +94,31 @@ export default async function Home() {
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <section className="rounded-[2rem] border border-ink/10 bg-white/75 p-8 shadow-glow backdrop-blur">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
-              {t.home.appName}
+              {t.home.rulesEyebrow}
             </p>
             <h1 className="mt-3 text-4xl font-semibold leading-tight text-ink sm:text-5xl">
-              {t.home.appSummary}
+              {t.home.rulesTitle}
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">
-              {t.home.appIntro}
+              {t.home.rulesIntro}
             </p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {[
+                [t.home.exactScoreRule, t.home.exactScoreRuleCopy],
+                [t.home.outcomeRule, t.home.outcomeRuleCopy],
+                [t.home.deadlineRule, t.home.deadlineRuleCopy],
+                [t.home.separateGroupsRule, t.home.separateGroupsRuleCopy],
+              ].map(([title, copy]) => (
+                <div
+                  key={title}
+                  className="rounded-2xl border border-black/5 bg-white/70 p-4"
+                >
+                  <p className="text-sm font-semibold text-ink">{title}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>
+                </div>
+              ))}
+            </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <a
@@ -110,28 +127,17 @@ export default async function Home() {
               >
                 {t.home.openDashboard}
               </a>
+              {/* Uncomment this to update results manually
               <Link
                 className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink transition hover:bg-white"
-                href="/admin/results"
+                href={localizePath("/admin/results", locale)}
               >
                 {t.home.enterResults}
               </Link>
+              */}
             </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-black/5 bg-sand/50 p-4">
-                <p className="text-3xl font-semibold text-ink">{memberships.length}</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-600">
-                  {t.home.privateLeagues}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-black/5 bg-[#0d1f17] p-4 text-white">
-                <p className="text-3xl font-semibold">{upcomingMatches.length}</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-pitch-200">
-                  {t.home.upcomingMatches}
-                </p>
-              </div>
-            </div>
+
           </section>
 
           <UpcomingMatchesSnapshot
@@ -190,7 +196,11 @@ export default async function Home() {
                         {membership.group._count.members} {t.common.members}
                       </p>
                     </div>
-                    <GroupLink groupId={membership.group.id} label={t.common.openGroup} />
+                    <GroupLink
+                      groupId={membership.group.id}
+                      href={localizePath(`/groups/${membership.group.id}`, locale)}
+                      label={t.common.openGroup}
+                    />
                   </div>
                 ))
               )}

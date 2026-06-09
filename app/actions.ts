@@ -12,10 +12,17 @@ import {
 } from "@/lib/auth";
 import { canSendEmail } from "@/lib/email";
 import { syncWorldCupMatches } from "@/lib/match-sync";
+import { getPredictionDeadline } from "@/lib/prediction-deadlines";
 import { scorePrediction } from "@/lib/scoring";
 import { prisma } from "@/lib/prisma";
 import { generateInviteCode } from "@/lib/invite-code";
-import { getLocaleCookieName, locales, type Locale } from "@/lib/i18n";
+import {
+  getLocale,
+  getLocaleCookieName,
+  locales,
+  localizePath,
+  type Locale,
+} from "@/lib/i18n";
 
 function parseScore(value: FormDataEntryValue | null) {
   const parsed = Number(value);
@@ -53,6 +60,7 @@ export async function signInOrCreateUser(formData: FormData) {
   const email = parseText(formData.get("email")).toLowerCase();
   const displayName = parseText(formData.get("displayName"));
   const intent = parseText(formData.get("intent"));
+  const locale = await getLocale();
 
   if (!email) {
     throw new Error("Email is required.");
@@ -67,11 +75,15 @@ export async function signInOrCreateUser(formData: FormData) {
   });
 
   if (intent === "login" && !existingUser) {
-    redirect(`/sign-in?mode=login&email=${encodeURIComponent(email)}&error=no_account`);
+    redirect(
+      `${localizePath("/sign-in", locale)}?email=${encodeURIComponent(email)}&error=no_account`,
+    );
   }
 
   if (intent === "register" && existingUser) {
-    redirect(`/sign-in?mode=register&email=${encodeURIComponent(email)}&error=account_exists`);
+    redirect(
+      `${localizePath("/register", locale)}?email=${encodeURIComponent(email)}&error=account_exists`,
+    );
   }
 
   const { code, emailSent } = await createLoginCode(email, displayName);
@@ -85,7 +97,7 @@ export async function signInOrCreateUser(formData: FormData) {
     params.set("devCode", code);
   }
 
-  redirect(`/verify?${params.toString()}`);
+  redirect(`${localizePath("/verify", locale)}?${params.toString()}`);
 }
 
 export async function verifySignInCode(formData: FormData) {
@@ -119,12 +131,12 @@ export async function verifySignInCode(formData: FormData) {
   }
 
   await createSession(user.id);
-  redirect("/");
+  redirect(localizePath("/", await getLocale()));
 }
 
 export async function signOut() {
   await clearSession();
-  redirect("/sign-in");
+  redirect(localizePath("/sign-in", await getLocale()));
 }
 
 export async function createGroup(formData: FormData) {
@@ -165,7 +177,7 @@ export async function createGroup(formData: FormData) {
   });
 
   revalidatePath("/");
-  redirect(`/groups/${group.id}`);
+  redirect(localizePath(`/groups/${group.id}`, await getLocale()));
 }
 
 export async function joinGroup(formData: FormData) {
@@ -223,7 +235,7 @@ export async function joinGroup(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath(`/groups/${group.id}`);
-  redirect(`/groups/${group.id}`);
+  redirect(localizePath(`/groups/${group.id}`, await getLocale()));
 }
 
 export async function savePrediction(formData: FormData) {
@@ -235,7 +247,7 @@ export async function savePrediction(formData: FormData) {
     throw new Error("Group and match are required.");
   }
 
-  const [membership, match] = await Promise.all([
+  const [membership, match, matches] = await Promise.all([
     prisma.groupMember.findUnique({
       where: {
         userId_groupId: {
@@ -247,6 +259,9 @@ export async function savePrediction(formData: FormData) {
     prisma.match.findUnique({
       where: { id: matchId },
     }),
+    prisma.match.findMany({
+      orderBy: { kickoffAt: "asc" },
+    }),
   ]);
 
   if (!membership) {
@@ -257,8 +272,10 @@ export async function savePrediction(formData: FormData) {
     throw new Error("Match not found.");
   }
 
-  if (match.kickoffAt <= new Date()) {
-    throw new Error("Predictions are locked after kickoff.");
+  const predictionDeadline = getPredictionDeadline(match, matches);
+
+  if (predictionDeadline <= new Date()) {
+    throw new Error("Predictions are locked after the prediction deadline.");
   }
 
   const predictedHome = parseScore(formData.get("predictedHome"));
@@ -275,12 +292,12 @@ export async function savePrediction(formData: FormData) {
     update: {
       predictedHome,
       predictedAway,
-      lockedAt: match.kickoffAt,
+      lockedAt: predictionDeadline,
     },
     create: {
       predictedHome,
       predictedAway,
-      lockedAt: match.kickoffAt,
+      lockedAt: predictionDeadline,
       userId: currentUser.id,
       groupId,
       matchId,

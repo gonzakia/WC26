@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { PredictionForm } from "@/components/prediction-form";
 import { getCountryFlag, getCountryLabel } from "@/lib/country-labels";
+import { isPredictionLocked } from "@/lib/prediction-deadlines";
 import {
   getKnockoutStageOrder,
   groupKnockoutMatchesByRound,
@@ -175,16 +176,24 @@ function MatchItem({
   prediction,
   labels,
   locale,
+  matches,
 }: {
   match: BrowserMatch;
   groupId: string;
   prediction?: BrowserPrediction;
   labels: MatchBrowserProps["labels"];
   locale: string;
+  matches: BrowserMatch[];
 }) {
   const language = locale.startsWith("es") ? "es" : "en";
-  const kickoff = new Date(match.kickoffAt);
-  const locked = kickoff <= new Date();
+  const deadlineMatches = matches.map((candidate) => ({
+    ...candidate,
+    kickoffAt: new Date(candidate.kickoffAt),
+  }));
+  const locked = isPredictionLocked(
+    { ...match, kickoffAt: new Date(match.kickoffAt) },
+    deadlineMatches,
+  );
   const homeTeam = getCountryLabel(match.homeTeam, locale);
   const awayTeam = getCountryLabel(match.awayTeam, locale);
 
@@ -331,6 +340,7 @@ export function MatchBrowser({
                       groupId={groupId}
                       labels={labels}
                       locale={locale}
+                      matches={matches}
                       match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
                       prediction={predictionsByMatchId[match.id]}
                     />
@@ -413,6 +423,7 @@ export function MatchBrowser({
                                 groupId={groupId}
                                 labels={labels}
                                 locale={locale}
+                                matches={matches}
                                 match={{
                                   ...match,
                                   kickoffAt: match.kickoffAt.toISOString(),
@@ -540,6 +551,7 @@ export function MatchBrowser({
                               groupId={groupId}
                               labels={labels}
                               locale={locale}
+                              matches={matches}
                               match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
                               prediction={predictionsByMatchId[match.id]}
                             />

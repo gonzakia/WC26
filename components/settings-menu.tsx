@@ -16,6 +16,28 @@ type SettingsMenuProps = {
   };
 };
 
+function stripLocalePrefix(pathname: string) {
+  if (pathname === "/es") {
+    return "/";
+  }
+
+  if (pathname.startsWith("/es/")) {
+    return pathname.slice(3) || "/";
+  }
+
+  return pathname;
+}
+
+function localizePath(pathname: string, locale: Locale) {
+  const stripped = stripLocalePrefix(pathname);
+
+  if (locale === "en") {
+    return stripped;
+  }
+
+  return stripped === "/" ? "/es" : `/es${stripped}`;
+}
+
 export function SettingsMenu({ currentLocale, labels }: SettingsMenuProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -45,7 +67,7 @@ export function SettingsMenu({ currentLocale, labels }: SettingsMenuProps) {
             ] as const).map(([locale, label]) => (
               <form action={setLanguage} key={locale}>
                 <input name="locale" type="hidden" value={locale} />
-                <input name="redirectTo" type="hidden" value={pathname} />
+                <input name="redirectTo" type="hidden" value={localizePath(pathname, locale)} />
                 <button
                   className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
                     currentLocale === locale

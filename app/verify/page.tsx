@@ -5,7 +5,7 @@ import { VerifyCodeForm } from "@/components/auth-forms";
 import { SectionCard } from "@/components/section-card";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getCurrentUser } from "@/lib/auth";
-import { getLocale, getTranslations } from "@/lib/i18n";
+import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
 
 type VerifyPageProps = {
   searchParams: Promise<{
@@ -22,7 +22,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
   const t = getTranslations(locale);
 
   if (user) {
-    redirect("/");
+    redirect(localizePath("/", locale));
   }
 
   const { email = "", devCode, mode, error } = await searchParams;
@@ -30,7 +30,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
   const hasError = error === "no_account" || error === "account_exists";
 
   if (!email) {
-    redirect("/sign-in");
+    redirect(localizePath("/sign-in", locale));
   }
 
   return (
@@ -59,7 +59,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
                 <div className="mt-4">
                   <Link
                     className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-                    href="/sign-in?mode=register"
+                    href={localizePath("/register", locale)}
                   >
                     {t.auth.registerNow}
                     <ArrowRight className="h-4 w-4" />
@@ -75,7 +75,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
                 <div className="mt-4">
                   <Link
                     className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-                    href="/sign-in?mode=login"
+                    href={localizePath("/sign-in", locale)}
                   >
                     {t.auth.login}
                     <ArrowRight className="h-4 w-4" />
@@ -87,7 +87,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
-                href={`/sign-in?mode=${authMode}`}
+                href={localizePath(authMode === "register" ? "/register" : "/sign-in", locale)}
               >
                 {t.auth.requestNewCode}
                 <ArrowRight className="h-4 w-4" />
@@ -103,7 +103,10 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
                 </p>
                 <Link
                   className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-                  href={error === "no_account" ? "/sign-in?mode=register" : "/sign-in?mode=login"}
+                  href={localizePath(
+                    error === "no_account" ? "/register" : "/sign-in",
+                    locale,
+                  )}
                 >
                   {error === "no_account" ? t.auth.registerNow : t.auth.login}
                   <ArrowRight className="h-4 w-4" />
