@@ -173,10 +173,10 @@ export function UpcomingMatchesSnapshot({
                               timeZone,
                             )}
                           </span>
-                          <span className="inline-flex items-center gap-1">
+                          {/*<span className="inline-flex items-center gap-1">
                             <MapPin className="h-3.5 w-3.5" />
                             {match.venue ?? labels.venueTbd}
-                          </span>
+                          </span>*/}
                         </div>
                       </div>
 

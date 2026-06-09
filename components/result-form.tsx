@@ -42,9 +42,9 @@ export function ResultForm({ match, labels, locale }: ResultFormProps) {
           <h3 className="mt-2 text-2xl font-semibold text-ink">
             {homeTeam} vs {awayTeam}
           </h3>
-          <p className="mt-2 text-sm text-slate-600">
+          {/*<p className="mt-2 text-sm text-slate-600">
             {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.venueTbd}
-          </p>
+          </p>*/}
         </div>
 
         <div className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">

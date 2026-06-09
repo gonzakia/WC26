@@ -211,9 +211,10 @@ function MatchItem({
               </span>
             ) : null}
           </div>
-          <p className="mt-2 text-sm text-slate-600">
+          {/*<p className="mt-2 text-sm text-slate-600">
             {formatKickoff(match.kickoffAt, locale)} · {match.venue ?? labels.common.venueTbd}
           </p>
+          */}
           <h3 className="mt-3 text-2xl font-semibold text-ink">
             {homeTeam} vs {awayTeam}
           </h3>
