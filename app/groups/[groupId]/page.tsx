@@ -15,8 +15,9 @@ type GroupPageProps = {
   }>;
 };
 
-const ONGOING_MATCH_WINDOW_MS = 3 * 60 * 60 * 1000;
+const FALLBACK_ONGOING_MATCH_WINDOW_MS = 3 * 60 * 60 * 1000;
 const LIVE_MATCH_STATUSES = new Set(["IN_PLAY", "PAUSED", "LIVE"]);
+const FINISHED_MATCH_STATUSES = new Set(["FINISHED", "AWARDED"]);
 
 export default async function GroupPage({ params }: GroupPageProps) {
   const { groupId } = await params;
@@ -30,15 +31,31 @@ export default async function GroupPage({ params }: GroupPageProps) {
 
   const { currentUser, group, membership, leaderboard, matches, predictionsByMatchId } = data;
   const now = new Date();
+  const predictionMembers = group.members.map((member) => ({
+    id: member.id,
+    displayName: member.displayName,
+    user: {
+      displayName: member.user.displayName,
+      predictions: member.user.predictions.map((prediction) => ({
+        matchId: prediction.matchId,
+        predictedHome: prediction.predictedHome,
+        predictedAway: prediction.predictedAway,
+      })),
+    },
+  }));
   const ongoingMatches = matches.filter((match) => {
     const kickoffTime = match.kickoffAt.getTime();
     if (LIVE_MATCH_STATUSES.has(match.status)) {
       return true;
     }
 
+    if (FINISHED_MATCH_STATUSES.has(match.status) || match.resultConfirmed) {
+      return false;
+    }
+
     return (
       kickoffTime <= now.getTime() &&
-      kickoffTime + ONGOING_MATCH_WINDOW_MS >= now.getTime()
+      kickoffTime + FALLBACK_ONGOING_MATCH_WINDOW_MS >= now.getTime()
     );
   });
 
@@ -96,7 +113,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
           labels={t.groupPage.ongoingPredictions}
           locale={locale}
           matches={ongoingMatches}
-          members={group.members}
+          members={predictionMembers}
         />
 
         <section className="mt-8 grid min-w-0 gap-8 lg:grid-cols-[1.25fr_0.75fr]">
@@ -123,11 +140,17 @@ export default async function GroupPage({ params }: GroupPageProps) {
                   open: t.common.open,
                 },
                 matchBrowser: t.matchBrowser,
+                predictionDetails: {
+                  noPick: t.groupPage.ongoingPredictions.noPick,
+                  exact: t.groupPage.ongoingPredictions.exact,
+                  outcome: t.groupPage.ongoingPredictions.outcome,
+                },
               }}
               matches={matches.map((match) => ({
                 ...match,
                 kickoffAt: match.kickoffAt.toISOString(),
               }))}
+              members={predictionMembers}
               predictionsByMatchId={Object.fromEntries(predictionsByMatchId.entries())}
             />
           </div>

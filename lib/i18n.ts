@@ -188,6 +188,7 @@ export const translations = {
         copy:
           "From kickoff until shortly after the match, everyone in the group can see the picks for that game. Light green means the pick currently has the right outcome; stronger green means it matches the current score exactly.",
         currentScore: "Current score",
+        finalScore: "Final score",
         noScore: "Score not available yet",
         noPick: "No pick",
         exact: "Exact",
@@ -224,6 +225,8 @@ export const translations = {
       cup: "Cup",
       match: "match",
       matches: "matches",
+      viewDetailedPredictions: "View detailed predictions",
+      hideDetailedPredictions: "Hide detailed predictions",
     },
     admin: {
       dataOps: "Data Ops",
@@ -424,6 +427,7 @@ export const translations = {
         copy:
           "Desde el inicio del partido y hasta poco después, todos en el grupo pueden ver las predicciones de ese juego. Verde claro significa que la predicción tiene el resultado correcto en ese momento; verde más fuerte significa que acierta el marcador actual exacto.",
         currentScore: "Marcador actual",
+        finalScore: "Marcador final",
         noScore: "Marcador no disponible todavía",
         noPick: "Sin predicción",
         exact: "Exacto",
@@ -460,6 +464,8 @@ export const translations = {
       cup: "Copa",
       match: "partido",
       matches: "partidos",
+      viewDetailedPredictions: "Ver predicciones detalladas",
+      hideDetailedPredictions: "Ocultar predicciones detalladas",
     },
     admin: {
       dataOps: "Datos",

@@ -100,8 +100,8 @@ npm run prisma:seed
 The app can also sync fixtures and results from football-data.org:
 
 - Admin UI: `/admin/results`
-- Cron route: `/api/cron/sync-world-cup`
-- Live score cron route: `/api/cron/sync-live-scores`
+- Scheduled full sync route: `/api/cron/sync-world-cup` once daily
+- Scheduled Vercel cron route: `/api/cron/sync-live-scores` once per minute
 - Authenticated live refresh route: `/api/live-scores`
 
 Confirmed results automatically update prediction points.

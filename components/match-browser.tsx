@@ -6,7 +6,12 @@ import {
   ChevronDown,
   ChevronLeft,
   GitBranch,
+  ListChecks,
 } from "lucide-react";
+import {
+  GroupPredictionList,
+  type GroupPredictionMember,
+} from "@/components/group-prediction-list";
 import { PredictionForm } from "@/components/prediction-form";
 import { getCountryFlag, getCountryLabel } from "@/lib/country-labels";
 import { getMatchVenue } from "@/lib/manual-venues";
@@ -42,6 +47,7 @@ type BrowserPrediction = {
 type MatchBrowserProps = {
   groupId: string;
   matches: BrowserMatch[];
+  members: GroupPredictionMember[];
   predictionsByMatchId: Record<string, BrowserPrediction>;
   locale: string;
   labels: {
@@ -67,6 +73,13 @@ type MatchBrowserProps = {
       cup: string;
       match: string;
       matches: string;
+      viewDetailedPredictions: string;
+      hideDetailedPredictions: string;
+    };
+    predictionDetails: {
+      noPick: string;
+      exact: string;
+      outcome: string;
     };
   };
 };
@@ -196,6 +209,7 @@ function MatchItem({
   labels,
   locale,
   matches,
+  members,
 }: {
   match: BrowserMatch;
   groupId: string;
@@ -203,7 +217,9 @@ function MatchItem({
   labels: MatchBrowserProps["labels"];
   locale: string;
   matches: BrowserMatch[];
+  members: GroupPredictionMember[];
 }) {
+  const [showDetailedPredictions, setShowDetailedPredictions] = useState(false);
   const language = locale.startsWith("es") ? "es" : "en";
   const deadlineMatches = matches.map((candidate) => ({
     ...candidate,
@@ -239,10 +255,24 @@ function MatchItem({
             {homeTeam} vs {awayTeam}
           </h3>
           
-          {match.resultConfirmed ? (
-            <p className="mt-3 text-sm font-medium text-pitch-800">
-              {labels.common.finalScore}: {match.homeScore} - {match.awayScore}
-            </p>
+          {match.resultConfirmed &&
+          match.homeScore !== null &&
+          match.awayScore !== null ? (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <p className="text-sm font-medium text-pitch-800">
+                {labels.common.finalScore}: {match.homeScore} - {match.awayScore}
+              </p>
+              <button
+                className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-pitch-900 transition hover:bg-pitch-50"
+                onClick={() => setShowDetailedPredictions((current) => !current)}
+                type="button"
+              >
+                <ListChecks className="h-3.5 w-3.5" />
+                {showDetailedPredictions
+                  ? labels.matchBrowser.hideDetailedPredictions
+                  : labels.matchBrowser.viewDetailedPredictions}
+              </button>
+            </div>
           ) : null}
         </div>
 
@@ -271,6 +301,16 @@ function MatchItem({
           matchId={match.id}
         />
       </div>
+
+      {showDetailedPredictions ? (
+        <div className="mt-5 rounded-3xl border border-black/5 bg-slate-50 p-4">
+          <GroupPredictionList
+            labels={labels.predictionDetails}
+            match={match}
+            members={members}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -278,6 +318,7 @@ function MatchItem({
 export function MatchBrowser({
   groupId,
   matches,
+  members,
   predictionsByMatchId,
   locale,
   labels,
@@ -367,6 +408,7 @@ export function MatchBrowser({
                       locale={locale}
                       matches={matches}
                       match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
+                      members={members}
                       prediction={predictionsByMatchId[match.id]}
                     />
                   )),
@@ -453,6 +495,7 @@ export function MatchBrowser({
                                   ...match,
                                   kickoffAt: match.kickoffAt.toISOString(),
                                 }}
+                                members={members}
                                 prediction={predictionsByMatchId[match.id]}
                               />
                             ))}
@@ -578,6 +621,7 @@ export function MatchBrowser({
                               locale={locale}
                               matches={matches}
                               match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
+                              members={members}
                               prediction={predictionsByMatchId[match.id]}
                             />
                           ))}
