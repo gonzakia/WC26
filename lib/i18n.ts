@@ -179,6 +179,17 @@ export const translations = {
       exact: "Exact",
       outcome: "Outcome",
       total: "Total",
+      ongoingPredictions: {
+        eyebrow: "Live picks",
+        title: "Predictions for the current match",
+        copy:
+          "From kickoff until shortly after the match, everyone in the group can see the picks for that game. Light green means the pick currently has the right outcome; stronger green means it matches the current score exactly.",
+        currentScore: "Current score",
+        noScore: "Score not available yet",
+        noPick: "No pick",
+        exact: "Exact",
+        outcome: "Outcome",
+      },
       management: {
         title: "Manage group",
         ownerTools: "Group settings",
@@ -401,6 +412,17 @@ export const translations = {
       exact: "Exacto",
       outcome: "Resultado",
       total: "Total",
+      ongoingPredictions: {
+        eyebrow: "Predicciones en vivo",
+        title: "Predicciones del partido actual",
+        copy:
+          "Desde el inicio del partido y hasta poco después, todos en el grupo pueden ver las predicciones de ese juego. Verde claro significa que la predicción tiene el resultado correcto en ese momento; verde más fuerte significa que acierta el marcador actual exacto.",
+        currentScore: "Marcador actual",
+        noScore: "Marcador no disponible todavía",
+        noPick: "Sin predicción",
+        exact: "Exacto",
+        outcome: "Resultado",
+      },
       management: {
         title: "Administrar grupo",
         ownerTools: "Configuración del grupo",

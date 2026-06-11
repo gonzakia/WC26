@@ -4,6 +4,7 @@ import { ChevronLeft, Trophy, Users } from "lucide-react";
 import { SignOutButton } from "@/components/auth-forms";
 import { GroupManagement } from "@/components/group-management";
 import { MatchBrowser } from "@/components/match-browser";
+import { OngoingPredictions } from "@/components/ongoing-predictions";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getGroupPageData } from "@/lib/data";
 import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
@@ -14,6 +15,9 @@ type GroupPageProps = {
     groupId: string;
   }>;
 };
+
+const ONGOING_MATCH_WINDOW_MS = 3 * 60 * 60 * 1000;
+const LIVE_MATCH_STATUSES = new Set(["IN_PLAY", "PAUSED", "LIVE"]);
 
 export default async function GroupPage({ params }: GroupPageProps) {
   const { groupId } = await params;
@@ -26,6 +30,18 @@ export default async function GroupPage({ params }: GroupPageProps) {
   }
 
   const { currentUser, group, membership, leaderboard, matches, predictionsByMatchId } = data;
+  const now = new Date();
+  const ongoingMatches = matches.filter((match) => {
+    const kickoffTime = match.kickoffAt.getTime();
+    if (LIVE_MATCH_STATUSES.has(match.status)) {
+      return true;
+    }
+
+    return (
+      kickoffTime <= now.getTime() &&
+      kickoffTime + ONGOING_MATCH_WINDOW_MS >= now.getTime()
+    );
+  });
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#faf5ea_0%,#f0e6d3_100%)] px-6 py-10 lg:px-10">
@@ -76,6 +92,13 @@ export default async function GroupPage({ params }: GroupPageProps) {
             </div>
           </div>
         </section>
+
+        <OngoingPredictions
+          labels={t.groupPage.ongoingPredictions}
+          locale={locale}
+          matches={ongoingMatches}
+          members={group.members}
+        />
 
         <section className="mt-8 grid min-w-0 gap-8 lg:grid-cols-[1.25fr_0.75fr]">
           <div className="min-w-0 rounded-[2rem] border border-ink/10 bg-white/80 p-8 shadow-glow backdrop-blur">

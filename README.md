@@ -27,6 +27,8 @@ compete on group-specific leaderboards.
 - Separate predictions per group, so the same user can make different picks in
   different groups.
 - Match browsing by date, group stage, and knockout stage.
+- Live group-overview prediction reveal for matches that are ongoing or just
+  finished.
 - Localized English and Spanish UI.
 - Locale-aware routes such as `/es`, `/es/sign-in`, and `/es/register`.
 - Clean auth routes: `/sign-in` for login and `/register` for registration.
