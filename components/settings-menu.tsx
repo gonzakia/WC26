@@ -17,8 +17,12 @@ type SettingsMenuProps = {
 };
 
 function stripLocalePrefix(pathname: string) {
-  if (pathname === "/es") {
+  if (pathname === "/en" || pathname === "/es") {
     return "/";
+  }
+
+  if (pathname.startsWith("/en/")) {
+    return pathname.slice(3) || "/";
   }
 
   if (pathname.startsWith("/es/")) {
@@ -31,11 +35,7 @@ function stripLocalePrefix(pathname: string) {
 function localizePath(pathname: string, locale: Locale) {
   const stripped = stripLocalePrefix(pathname);
 
-  if (locale === "en") {
-    return stripped;
-  }
-
-  return stripped === "/" ? "/es" : `/es${stripped}`;
+  return stripped === "/" ? `/${locale}` : `/${locale}${stripped}`;
 }
 
 export function SettingsMenu({ currentLocale, labels }: SettingsMenuProps) {
@@ -54,7 +54,7 @@ export function SettingsMenu({ currentLocale, labels }: SettingsMenuProps) {
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-20 mt-3 w-64 rounded-[1.5rem] border border-black/5 bg-white p-4 shadow-glow">
+        <div className="fixed inset-x-4 top-20 z-20 rounded-[1.5rem] border border-black/5 bg-white p-4 shadow-glow sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-64">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink">
             <Globe className="h-4 w-4" />
             {labels.language}
