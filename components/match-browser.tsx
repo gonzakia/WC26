@@ -543,8 +543,8 @@ export function MatchBrowser({
                             ? labels.matchBrowser.match
                             : labels.matchBrowser.matches}
                         </p>
-                        <div className="mt-4 space-y-3">
-                          {round.matches.slice(0, 4).map((match) => (
+                        <div className="mt-4 max-h-72 space-y-3 overflow-y-auto pr-1">
+                          {round.matches.map((match) => (
                             <div
                               key={match.id}
                               className={`rounded-xl border px-3 py-3 text-sm ${

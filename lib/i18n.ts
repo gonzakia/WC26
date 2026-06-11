@@ -412,8 +412,8 @@ export const translations = {
       leaderboardTitle: "Tabla en vivo de este grupo",
       leaderboardCopy:
         "Gana 3 puntos por acertar el marcador exacto, 1 punto por acertar el ganador o empate y 0 puntos si el resultado es incorrecto.",
-      members: "Miembros",
-      inviteCode: "código de invitacion",
+      members: "Participantes",
+      inviteCode: "Código de invitación",
       player: "Jugador",
       exact: "Exacto",
       outcome: "Resultado",
