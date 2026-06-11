@@ -68,15 +68,18 @@ export function AuthForm({
 export function VerifyCodeForm({
   email,
   devCode,
+  mode,
   labels,
 }: {
   email: string;
   devCode?: string;
+  mode: "login" | "register";
   labels: AuthLabels;
 }) {
   return (
     <form action={verifySignInCode} className="space-y-4">
       <input name="email" type="hidden" value={email} />
+      <input name="mode" type="hidden" value={mode} />
 
       <div>
         <label className="text-sm font-medium text-slate-700" htmlFor="code">

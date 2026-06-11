@@ -103,6 +103,8 @@ export async function signInOrCreateUser(formData: FormData) {
 export async function verifySignInCode(formData: FormData) {
   const email = parseText(formData.get("email")).toLowerCase();
   const code = parseText(formData.get("code"));
+  const mode = parseText(formData.get("mode")) === "register" ? "register" : "login";
+  const locale = await getLocale();
 
   if (!email || !code) {
     throw new Error("Email and verification code are required.");
@@ -111,7 +113,13 @@ export async function verifySignInCode(formData: FormData) {
   const loginCode = await consumeLoginCode(email, code);
 
   if (!loginCode) {
-    throw new Error("That code is invalid or expired.");
+    const params = new URLSearchParams({
+      email,
+      mode,
+      error: "invalid_code",
+    });
+
+    redirect(`${localizePath("/verify", locale)}?${params.toString()}`);
   }
 
   let user = await prisma.user.findUnique({
@@ -131,7 +139,7 @@ export async function verifySignInCode(formData: FormData) {
   }
 
   await createSession(user.id);
-  redirect(localizePath("/", await getLocale()));
+  redirect(localizePath("/", locale));
 }
 
 export async function signOut() {

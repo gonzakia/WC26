@@ -68,6 +68,9 @@ export const translations = {
       noAccountCopy: "Check that the email is correct, or register now if this is a new account.",
       accountExistsTitle: "An account already exists",
       accountExistsCopy: "Try logging in with this email instead.",
+      invalidCodeTitle: "That code did not work",
+      invalidCodeCopy:
+        "The code may be expired or mistyped. Try entering it again, or request a new code.",
       codeEyebrow: "Code",
       finishSignIn: "Finish signing in",
       verificationCode: "Verification code",
@@ -301,6 +304,9 @@ export const translations = {
       noAccountCopy: "Revisa que el correo sea correcto, o regístrate ahora si es una cuenta nueva.",
       accountExistsTitle: "Ya existe una cuenta",
       accountExistsCopy: "Prueba iniciar sesión con este correo.",
+      invalidCodeTitle: "Ese código no funcionó",
+      invalidCodeCopy:
+        "El código puede estar vencido o mal escrito. Intenta ingresarlo otra vez o solicita un código nuevo.",
       codeEyebrow: "Código",
       finishSignIn: "Completar acceso",
       verificationCode: "Código de verificación",

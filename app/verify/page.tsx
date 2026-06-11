@@ -28,6 +28,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
   const { email = "", devCode, mode, error } = await searchParams;
   const authMode = mode === "register" ? "register" : "login";
   const hasError = error === "no_account" || error === "account_exists";
+  const hasInvalidCode = error === "invalid_code";
 
   if (!email) {
     redirect(localizePath("/sign-in", locale));
@@ -84,6 +85,13 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
               </div>
             ) : null}
 
+            {hasInvalidCode ? (
+              <div className="mt-6 rounded-2xl border border-red-100 bg-red-50 p-5 text-sm leading-6 text-red-900">
+                <p className="font-semibold">{t.auth.invalidCodeTitle}</p>
+                <p className="mt-1">{t.auth.invalidCodeCopy}</p>
+              </div>
+            ) : null}
+
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink backdrop-blur transition hover:bg-white"
@@ -117,6 +125,7 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
                 <VerifyCodeForm
                   devCode={devCode}
                   email={email}
+                  mode={authMode}
                   labels={{
                     email: t.auth.email,
                     emailPlaceholder: t.auth.emailPlaceholder,
