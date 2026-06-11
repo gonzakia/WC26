@@ -36,6 +36,7 @@ compete on group-specific leaderboards.
 - Upcoming match snapshots using local display time.
 - Manual result entry on the admin results page.
 - football-data.org sync route for fixtures and confirmed results.
+- Live-score sync route for in-progress match scores.
 - Manual venue mapping for matches whose venue is not available from the data
   provider.
 
@@ -100,8 +101,12 @@ The app can also sync fixtures and results from football-data.org:
 
 - Admin UI: `/admin/results`
 - Cron route: `/api/cron/sync-world-cup`
+- Live score cron route: `/api/cron/sync-live-scores`
+- Authenticated live refresh route: `/api/live-scores`
 
 Confirmed results automatically update prediction points.
+Live scores are stored while a match is in progress, but points are only awarded
+after the result is confirmed.
 
 ## Manual Venues
 

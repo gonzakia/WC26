@@ -7,6 +7,7 @@ import { formatKickoff } from "@/lib/date";
 import { getMatchOutcome } from "@/lib/scoring";
 import { normalizeStageLabel } from "@/lib/tournament";
 import type { Locale } from "@/lib/i18n";
+import { LiveScoreRefresher } from "@/components/live-score-refresher";
 
 type OngoingMatch = {
   id: string;
@@ -54,7 +55,7 @@ type OngoingPredictionsProps = {
 function getPredictionStatus(
   prediction: { predictedHome: number; predictedAway: number } | undefined,
   match: OngoingMatch,
-) {
+): "exact" | "outcome" | null {
   if (
     !prediction ||
     match.homeScore === null ||
@@ -94,6 +95,66 @@ function getPredictionClass(status: "exact" | "outcome" | null) {
   return "border-black/5 bg-white text-slate-800";
 }
 
+function getStatusRank(status: "exact" | "outcome" | null) {
+  if (status === "exact") {
+    return 0;
+  }
+
+  if (status === "outcome") {
+    return 1;
+  }
+
+  return 2;
+}
+
+function getPredictionOutcomeRank(
+  prediction: { predictedHome: number; predictedAway: number } | undefined,
+) {
+  if (!prediction) {
+    return 3;
+  }
+
+  if (prediction.predictedHome === prediction.predictedAway) {
+    return 0;
+  }
+
+  return prediction.predictedHome > prediction.predictedAway ? 1 : 2;
+}
+
+function comparePredictions(
+  first: { predictedHome: number; predictedAway: number } | undefined,
+  second: { predictedHome: number; predictedAway: number } | undefined,
+) {
+  if (!first && !second) {
+    return 0;
+  }
+
+  if (!first) {
+    return 1;
+  }
+
+  if (!second) {
+    return -1;
+  }
+
+  const outcomeDifference =
+    getPredictionOutcomeRank(first) - getPredictionOutcomeRank(second);
+
+  if (outcomeDifference !== 0) {
+    return outcomeDifference;
+  }
+
+  if (first.predictedAway !== second.predictedAway) {
+    return first.predictedAway - second.predictedAway;
+  }
+
+  if (first.predictedHome !== second.predictedHome) {
+    return first.predictedHome - second.predictedHome;
+  }
+
+  return 0;
+}
+
 export function OngoingPredictions({
   matches,
   members,
@@ -112,6 +173,7 @@ export function OngoingPredictions({
 
   return (
     <section className="mt-8 rounded-[2rem] border border-emerald-200 bg-white/85 p-6 shadow-glow backdrop-blur lg:p-8">
+      <LiveScoreRefresher />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-700">
@@ -131,6 +193,41 @@ export function OngoingPredictions({
           const awayTeam = getCountryLabel(match.awayTeam, locale);
           const hasScore = match.homeScore !== null && match.awayScore !== null;
           const kickoffAt = new Date(match.kickoffAt);
+          const orderedMembers = members
+            .map((member) => {
+              const prediction = member.user.predictions.find(
+                (candidate) => candidate.matchId === match.id,
+              );
+              const status = getPredictionStatus(prediction, match);
+              const memberName =
+                member.displayName?.trim() || member.user.displayName;
+
+              return {
+                member,
+                memberName,
+                prediction,
+                status,
+              };
+            })
+            .sort((first, second) => {
+              const statusDifference =
+                getStatusRank(first.status) - getStatusRank(second.status);
+
+              if (statusDifference !== 0) {
+                return statusDifference;
+              }
+
+              const predictionDifference = comparePredictions(
+                first.prediction,
+                second.prediction,
+              );
+
+              if (predictionDifference !== 0) {
+                return predictionDifference;
+              }
+
+              return first.memberName.localeCompare(second.memberName);
+            });
 
           return (
             <div
@@ -161,14 +258,7 @@ export function OngoingPredictions({
               </div>
 
               <div className="mt-4 grid max-w-4xl gap-2 sm:grid-cols-2 xl:grid-cols-3">
-                {members.map((member) => {
-                  const prediction = member.user.predictions.find(
-                    (candidate) => candidate.matchId === match.id,
-                  );
-                  const status = getPredictionStatus(prediction, match);
-                  const memberName =
-                    member.displayName?.trim() || member.user.displayName;
-
+                {orderedMembers.map(({ member, memberName, prediction, status }) => {
                   return (
                     <div
                       className={`rounded-2xl border px-3 py-2 text-sm transition ${getPredictionClass(status)}`}

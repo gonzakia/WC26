@@ -3,6 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { scorePrediction } from "@/lib/scoring";
 import { getRequiredEnv } from "@/lib/env";
 
+type FootballDataScoreSection = {
+  home?: number | null;
+  away?: number | null;
+  homeTeam?: number | null;
+  awayTeam?: number | null;
+};
+
 type FootballDataMatch = {
   id: number;
   utcDate: string;
@@ -18,16 +25,22 @@ type FootballDataMatch = {
     name: string | null;
   };
   score: {
-    fullTime: {
-      home: number | null;
-      away: number | null;
-    };
+    fullTime?: FootballDataScoreSection | null;
+    regularTime?: FootballDataScoreSection | null;
   };
 };
 
 type FootballDataResponse = {
   matches: FootballDataMatch[];
 };
+
+type SyncWorldCupMatchesOptions = {
+  onlyLocalMatchIds?: Set<string>;
+};
+
+const LIVE_MATCH_STATUSES = new Set(["LIVE", "IN_PLAY", "PAUSED"]);
+const LIVE_SYNC_BEFORE_KICKOFF_MS = 15 * 60 * 1000;
+const LIVE_SYNC_AFTER_KICKOFF_MS = 4 * 60 * 60 * 1000;
 
 function slugifyPart(value: string) {
   return value
@@ -55,8 +68,52 @@ function buildSlug(match: FootballDataMatch) {
   ].join("-");
 }
 
+function readScoreValue(
+  section: FootballDataScoreSection | undefined | null,
+  side: "home" | "away",
+) {
+  if (!section) {
+    return null;
+  }
+
+  const legacyKey = side === "home" ? "homeTeam" : "awayTeam";
+  const value = section[side] ?? section[legacyKey];
+
+  return typeof value === "number" ? value : null;
+}
+
+function getAvailableScore(match: FootballDataMatch) {
+  const sections = [match.score.fullTime, match.score.regularTime];
+
+  for (const section of sections) {
+    const home = readScoreValue(section, "home");
+    const away = readScoreValue(section, "away");
+
+    if (home !== null && away !== null) {
+      return { home, away };
+    }
+  }
+
+  return null;
+}
+
 function isFinished(status: string, home: number | null, away: number | null) {
   return ["FINISHED", "AWARDED"].includes(status) && home !== null && away !== null;
+}
+
+function revalidateAppPath(path: string) {
+  try {
+    revalidatePath(path);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("static generation store missing")
+    ) {
+      return;
+    }
+
+    throw error;
+  }
 }
 
 async function updatePredictionScores(matchId: string, homeScore: number, awayScore: number) {
@@ -85,7 +142,7 @@ async function updatePredictionScores(matchId: string, homeScore: number, awaySc
   );
 }
 
-export async function syncWorldCupMatches() {
+export async function syncWorldCupMatches(options: SyncWorldCupMatchesOptions = {}) {
   const token = getRequiredEnv("FOOTBALL_DATA_API_TOKEN");
   const season = process.env.WORLD_CUP_SEASON ?? "2026";
 
@@ -111,17 +168,14 @@ export async function syncWorldCupMatches() {
   let created = 0;
   let updated = 0;
   let completed = 0;
+  let liveUpdated = 0;
+  let skipped = 0;
 
   for (const remoteMatch of payload.matches ?? []) {
     const slug = buildSlug(remoteMatch);
     const remoteId = String(remoteMatch.id);
     const homeTeam = safeTeamName(remoteMatch.homeTeam.name, "TBD Home");
     const awayTeam = safeTeamName(remoteMatch.awayTeam.name, "TBD Away");
-    const finished = isFinished(
-      remoteMatch.status,
-      remoteMatch.score.fullTime.home,
-      remoteMatch.score.fullTime.away,
-    );
 
     const existing =
       (await prisma.match.findUnique({
@@ -130,6 +184,23 @@ export async function syncWorldCupMatches() {
       (await prisma.match.findUnique({
         where: { slug },
       }));
+
+    if (
+      options.onlyLocalMatchIds &&
+      (!existing || !options.onlyLocalMatchIds.has(existing.id))
+    ) {
+      skipped += 1;
+      continue;
+    }
+
+    const score = getAvailableScore(remoteMatch);
+    const finished = isFinished(
+      remoteMatch.status,
+      score?.home ?? null,
+      score?.away ?? null,
+    );
+    const keepExistingLiveScore =
+      LIVE_MATCH_STATUSES.has(remoteMatch.status) && !score && existing;
 
     const baseData = {
       slug,
@@ -141,8 +212,8 @@ export async function syncWorldCupMatches() {
       homeTeam,
       awayTeam,
       venue: remoteMatch.venue,
-      homeScore: finished ? remoteMatch.score.fullTime.home : null,
-      awayScore: finished ? remoteMatch.score.fullTime.away : null,
+      homeScore: score?.home ?? (keepExistingLiveScore ? existing.homeScore : null),
+      awayScore: score?.away ?? (keepExistingLiveScore ? existing.awayScore : null),
       resultConfirmed: finished,
       status: remoteMatch.status,
       sourceUpdatedAt: remoteMatch.lastUpdated
@@ -173,26 +244,88 @@ export async function syncWorldCupMatches() {
         localMatch.awayScore,
       );
       completed += 1;
+    } else if (
+      LIVE_MATCH_STATUSES.has(localMatch.status) &&
+      localMatch.homeScore !== null &&
+      localMatch.awayScore !== null
+    ) {
+      liveUpdated += 1;
     }
   }
 
-  revalidatePath("/");
-  revalidatePath("/admin/results");
+  revalidateAppPath("/");
+  revalidateAppPath("/admin/results");
 
   const groups = await prisma.group.findMany({
     select: { id: true },
   });
 
   groups.forEach((group) => {
-    revalidatePath(`/groups/${group.id}`);
+    revalidateAppPath(`/groups/${group.id}`);
   });
 
   return {
     created,
     updated,
     completed,
+    liveUpdated,
+    skipped,
     total: payload.matches?.length ?? 0,
     syncedAt,
     provider: "football-data.org",
   };
+}
+
+export async function syncLiveWorldCupMatches() {
+  const now = new Date();
+  const staleBefore = new Date(now.getTime() - 60 * 1000);
+  const liveWindowStart = new Date(now.getTime() - LIVE_SYNC_AFTER_KICKOFF_MS);
+  const liveWindowEnd = new Date(now.getTime() + LIVE_SYNC_BEFORE_KICKOFF_MS);
+  const candidateMatches = await prisma.match.findMany({
+    where: {
+      OR: [
+        {
+          kickoffAt: {
+            gte: liveWindowStart,
+            lte: liveWindowEnd,
+          },
+        },
+        {
+          status: {
+            in: Array.from(LIVE_MATCH_STATUSES),
+          },
+        },
+      ],
+    },
+    select: {
+      id: true,
+      syncedAt: true,
+    },
+  });
+
+  if (candidateMatches.length === 0) {
+    return {
+      skipped: true,
+      reason: "No matches are close enough to kickoff for live sync.",
+      syncedAt: now,
+      provider: "football-data.org",
+    };
+  }
+
+  const needsSync = candidateMatches.some(
+    (match) => !match.syncedAt || match.syncedAt < staleBefore,
+  );
+
+  if (!needsSync) {
+    return {
+      skipped: true,
+      reason: "Live matches were synced less than a minute ago.",
+      syncedAt: now,
+      provider: "football-data.org",
+    };
+  }
+
+  return syncWorldCupMatches({
+    onlyLocalMatchIds: new Set(candidateMatches.map((match) => match.id)),
+  });
 }
