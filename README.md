@@ -1,120 +1,236 @@
 # WC26 Predictions
 
-WC26 Predictions is a learning-focused full-stack app for the 2026 FIFA World Cup.
-Players join private groups, predict match scorelines, earn points for exact picks
-or correct outcomes, and compete on a shared leaderboard.
+WC26 Predictions is a full-stack Next.js app for private 2026 FIFA World Cup
+prediction groups. Users can register or log in with a one-time email code,
+join one or more private groups, make score predictions for each group, and
+compete on group-specific leaderboards.
 
 ## Stack
 
-- Next.js (App Router)
+- Next.js App Router
+- React 19
 - TypeScript
 - Tailwind CSS
 - Prisma
-- Resend for sign-in emails
-- football-data.org for fixture/result sync
-- Postgres for production, SQLite was used locally
+- Postgres for production
+- Resend for one-time sign-in emails
+- football-data.org for fixture and result sync
 
-This repo is scaffolded manually because the current environment does not have
-Node.js installed, but the project structure is ready to install and run once
-Node is available.
+## Current Features
 
-## MVP features
+- Passwordless login and registration with one-time verification codes.
+- Private group creation and invite-code based joining.
+- Group-specific display names through `GroupMember.displayName`.
+- Separate predictions per group, so the same user can make different picks in
+  different groups.
+- Match browsing by date, group stage, and knockout stage.
+- Localized English and Spanish UI.
+- Locale-aware routes such as `/es`, `/es/sign-in`, and `/es/register`.
+- Clean auth routes: `/sign-in` for login and `/register` for registration.
+- Save confirmation feedback after submitting a prediction.
+- Upcoming match snapshots using local display time.
+- Manual result entry on the admin results page.
+- football-data.org sync route for fixtures and confirmed results.
+- Manual venue mapping for matches whose venue is not available from the data
+  provider.
 
-- Create or join a prediction group
-- View upcoming World Cup matches
-- Submit one prediction per match before kickoff
-- Award 3 points for an exact score
-- Award 1 point for the correct winner or draw
-- Show a leaderboard for each group
+## Prediction Rules
 
-## Current auth flow
+Scoring is intentionally simple:
 
-The app now uses a simple custom session flow backed by Prisma:
+- Exact score: 3 points.
+- Correct winner or draw, but not exact score: 1 point.
+- Wrong outcome: 0 points.
 
-- users request a one-time sign-in code with an email
-- if Resend is configured, the code is emailed to them
-- in local development without email credentials, the verification code is shown on the `/verify` page
-- after code verification, the app creates a new user if needed
-- a session token is stored in an HTTP-only cookie
-- session records and login codes live in the database
+Prediction deadlines:
 
-## Match data sync
+- Each match locks at its own kickoff time.
 
-The app can sync World Cup fixtures and final results from football-data.org.
-That means you do not have to seed every match or manually update scores for
-each group.
+Points are recalculated from stored predictions whenever confirmed match results
+are entered or synced.
 
-- manual sync is available on `/admin/results`
-- automatic sync is supported through `/api/cron/sync-world-cup`
-- confirmed results automatically recalculate prediction points
+## Routing And Language
 
-## Data model
+Language is controlled by both the URL and the stored locale cookie.
 
-The initial Prisma schema includes:
+- `/` uses the saved language cookie, or English by default.
+- `/es` forces Spanish and stores Spanish in the locale cookie.
+- `/sign-in` shows the login flow.
+- `/register` rewrites internally to the registration version of `/sign-in`.
+- `/es/sign-in` and `/es/register` combine the language prefix with the auth
+  flow.
+
+The middleware in `middleware.ts` handles locale prefixes, the register rewrite,
+and the `x-wc26-locale` request header used by `lib/i18n.ts`.
+
+## Data Model
+
+The Prisma schema currently includes:
 
 - `User`
+- `LoginCode`
+- `Session`
 - `Group`
 - `GroupMember`
 - `Match`
 - `Prediction`
 
-## Local setup
+Important details:
 
-1. Install Node.js 20 or newer.
-2. Copy `.env.example` to `.env`.
-3. Install dependencies with `npm install`.
-4. Generate Prisma client with `npm run prisma:generate`.
-5. Point `DATABASE_URL` at a Postgres database.
-6. Seed starter data with `npm run prisma:seed`.
-7. Start the app with `npm run dev`.
+- `User.displayName` is the account-level display name.
+- `GroupMember.displayName` is the name shown inside a specific group.
+- `Prediction` is unique per user, group, and match.
+- `Match.externalMatchId`, `source`, `sourceUpdatedAt`, and `syncedAt` support
+  fixture/result syncing.
 
-Set these environment variables if you want production-style behavior:
+## Match Data
+
+Matches are stored in the `Match` table and can be seeded locally with:
+
+```bash
+npm run prisma:seed
+```
+
+The app can also sync fixtures and results from football-data.org:
+
+- Admin UI: `/admin/results`
+- Cron route: `/api/cron/sync-world-cup`
+
+Confirmed results automatically update prediction points.
+
+## Manual Venues
+
+Manual venue data lives in `lib/manual-venues.ts`.
+
+Use this file when football-data.org does not provide venue data. The workflow is:
+
+1. Add each stadium once in the `venues` object.
+2. Map each manual game ID to a venue ID in `matchVenueIds`.
+
+Manual game IDs are not football-data.org IDs and are not database IDs. They are
+stable local IDs based on the tournament schedule:
+
+- `gs-1` through `gs-72`
+- `r32-1` through `r32-16`
+- `r16-1` through `r16-8`
+- `qf-1` through `qf-4`
+- `sf-1` through `sf-2`
+- `third`
+- `final`
+
+The `gameIds` object connects those IDs to real matches by stage, kickoff time,
+and teams. The `matchVenueIds` object connects those same IDs to a venue.
+
+If two matches have the same kickoff time and FIFA's official order differs from
+the current order, update the relevant entries in `gameIds`, then keep the venue
+mapping in `matchVenueIds` aligned with the game number.
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and fill in the values for your environment.
+
+Required for database access:
+
+- `DATABASE_URL`
+- `DIRECT_URL`
+
+Required for production-style email login:
 
 - `RESEND_API_KEY`
 - `EMAIL_FROM`
+
+Required for football-data.org sync:
+
 - `FOOTBALL_DATA_API_TOKEN`
-- `WORLD_CUP_SEASON` defaults to `2026`
+
+Optional for scheduled sync protection:
+
 - `CRON_SECRET`
-- `DIRECT_URL` for Prisma schema commands
 
-If you change the Prisma schema after already creating your database, run:
+If email credentials are not configured, the verification flow can show the
+one-time code on the verification screen for local development.
 
-- `prisma db push`
-- `npm run prisma:generate`
+## Local Setup
 
-## Suggested deployment setup
+1. Install Node.js 20 or newer.
+2. Install dependencies:
 
-1. Configure Resend and verify a sending domain or use the Resend test sender for development.
-2. Add your football-data.org API token.
-3. Protect `/api/cron/sync-world-cup` with `CRON_SECRET`.
-4. If you deploy on Vercel Hobby, the included `vercel.json` schedules `/api/cron/sync-world-cup` once per day.
-5. If you deploy somewhere else, point your scheduler at that same route instead.
+```bash
+npm install
+```
 
-## Deployment note
+3. Copy the environment template:
 
-The production database should be Postgres.
+```bash
+cp .env.example .env
+```
 
-Before launching this to friends and family, the recommended next move is:
+4. Generate the Prisma client:
 
-1. Keep the Neon Postgres integration connected to the project.
-2. Add Neon’s direct connection string as `DIRECT_URL`.
-3. Deploy the app to Vercel with the production environment variables set.
-4. Let the `vercel-build` script run `prisma db push` so the tables are created.
+```bash
+npm run prisma:generate
+```
 
-The repo already includes a `vercel-build` script:
+5. Apply the database schema:
 
-- `npm run vercel-build`
+```bash
+npx prisma db push
+```
 
-That uses:
+6. Seed starter match data:
 
-- `prisma db push`
-- `prisma generate`
-- `next build`
+```bash
+npm run prisma:seed
+```
 
-## Suggested next steps
+7. Start the development server:
 
-1. Restrict data sync and manual overrides to app admins or group owners.
-2. Add validation and friendly form error states with `useActionState`.
-3. Add profile editing so users can change display names.
-4. Add a sync history table with provider responses and failure logs.
-5. Add richer result handling for extra time and penalty shootouts.
+```bash
+npm run dev
+```
+
+## Scripts
+
+- `npm run dev`: start the Next.js development server.
+- `npm run build`: build the Next.js app.
+- `npm run start`: start the built app.
+- `npm run vercel-build`: push the Prisma schema, generate Prisma client, and
+  build the app for Vercel.
+- `npm run lint`: run ESLint.
+- `npm run prisma:generate`: generate Prisma client.
+- `npm run prisma:migrate`: run Prisma migrations locally.
+- `npm run prisma:seed`: seed starter data.
+- `npm run prisma:studio`: open Prisma Studio.
+
+## Deployment
+
+The production database should be Postgres. The repo is set up for Vercel-style
+deployment with:
+
+```bash
+npm run vercel-build
+```
+
+That script runs:
+
+```bash
+prisma db push && prisma generate && next build
+```
+
+For production:
+
+1. Configure a Postgres database, such as Neon.
+2. Set `DATABASE_URL` and `DIRECT_URL`.
+3. Configure Resend and set `RESEND_API_KEY` and `EMAIL_FROM`.
+4. Add `FOOTBALL_DATA_API_TOKEN` if fixture/result sync should run.
+5. Set `CRON_SECRET` if the sync endpoint should be protected.
+
+## Known Notes
+
+- ESLint is listed as version 9, but the repo currently does not include an
+  `eslint.config.*` file. `npm run lint` may need an ESLint config migration
+  before it works.
+- Venue mapping is manual and should be reviewed whenever match order or kickoff
+  data changes.
+- Admin result entry and data sync routes should be restricted before sharing
+  broadly outside trusted users.

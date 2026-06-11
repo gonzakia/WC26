@@ -112,7 +112,7 @@ export const translations = {
       outcomeRuleCopy: "Pick the right winner or draw for 1 point if the score is not exact.",
       deadlineRule: "Prediction deadlines",
       deadlineRuleCopy:
-        "Group-stage picks lock when that group's first match starts. Knockout picks lock at the kickoff of each individual match.",
+        "Each match locks at its own kickoff, so you can keep editing a prediction until that game starts.",
       separateGroupsRule: "Separate groups",
       separateGroupsRuleCopy:
         "If you join more than one group, enter predictions in each group separately. Your picks can be different from group to group.",
@@ -315,7 +315,7 @@ export const translations = {
       outcomeRuleCopy: "Acertar el ganador o empate vale 1 punto si el marcador no es exacto.",
       deadlineRule: "Cierres de predicción",
       deadlineRuleCopy:
-        "En fase de grupos, las predicciones se cierran cuando empieza el primer partido de ese grupo. En rondas finales, cada partido se cierra en su propio inicio.",
+        "Cada partido se cierra en su propio inicio, así que puedes editar una predicción hasta que empiece ese partido.",
       separateGroupsRule: "Grupos separados",
       separateGroupsRuleCopy:
         "Si estás en más de un grupo, debes ingresar tus predicciones en cada grupo por separado. Pueden ser diferentes entre grupos.",
