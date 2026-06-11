@@ -33,6 +33,7 @@ type UpcomingMatchesSnapshotProps = {
     tomorrow: string;
     venueTbd: string;
     open: string;
+    locked: string;
     noUpcomingMatches: string;
   };
 };
@@ -153,44 +154,48 @@ export function UpcomingMatchesSnapshot({
                 {group.label}
               </div>
               <div className="mt-3 space-y-3">
-                {group.matches.map((match) => (
-                  <article
-                    key={match.id}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-[11px] uppercase tracking-[0.22em] text-pitch-200">
-                          {normalizeStageLabel(match.stage, locale.startsWith("es") ? "es" : "en")}
-                        </p>
-                        <h3 className="mt-2 text-base font-semibold leading-snug text-white">
-                          {getCountryLabel(match.homeTeam, locale)} vs{" "}
-                          {getCountryLabel(match.awayTeam, locale)}
-                        </h3>
-                        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-300">
-                          <span className="inline-flex items-center gap-1">
-                            <Clock3 className="h-3.5 w-3.5" />
-                            {formatKickoff(
-                              match.kickoffAt,
-                              locale === "es" ? "es-ES" : "en-US",
-                              timeZone,
-                            )}
-                          </span>
-                          {getMatchVenue(match, locale) ? (
-                            <span className="inline-flex items-center gap-1">
-                              <MapPin className="h-3.5 w-3.5" />
-                              {getMatchVenue(match, locale)}
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
+                {group.matches.map((match) => {
+                  const locked = match.kickoffAt <= now;
 
-                      <span className="shrink-0 rounded-full bg-pitch-400/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pitch-100">
-                        {labels.open}
-                      </span>
-                    </div>
-                  </article>
-                ))}
+                  return (
+                    <article
+                      key={match.id}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-[11px] uppercase tracking-[0.22em] text-pitch-200">
+                            {normalizeStageLabel(match.stage, locale.startsWith("es") ? "es" : "en")}
+                          </p>
+                          <h3 className="mt-2 text-base font-semibold leading-snug text-white">
+                            {getCountryLabel(match.homeTeam, locale)} vs{" "}
+                            {getCountryLabel(match.awayTeam, locale)}
+                          </h3>
+                          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-300">
+                            <span className="inline-flex items-center gap-1">
+                              <Clock3 className="h-3.5 w-3.5" />
+                              {formatKickoff(
+                                match.kickoffAt,
+                                locale === "es" ? "es-ES" : "en-US",
+                                timeZone,
+                              )}
+                            </span>
+                            {getMatchVenue(match, locale) ? (
+                              <span className="inline-flex items-center gap-1">
+                                <MapPin className="h-3.5 w-3.5" />
+                                {getMatchVenue(match, locale)}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <span className="shrink-0 rounded-full bg-pitch-400/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pitch-100">
+                          {locked ? labels.locked : labels.open}
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </div>
           ))

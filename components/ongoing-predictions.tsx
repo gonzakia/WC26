@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Clock3 } from "lucide-react";
 import { getCountryLabel } from "@/lib/country-labels";
 import { formatKickoff } from "@/lib/date";
@@ -9,7 +12,7 @@ type OngoingMatch = {
   id: string;
   stage: string;
   groupName?: string | null;
-  kickoffAt: Date;
+  kickoffAt: Date | string;
   status: string;
   homeTeam: string;
   awayTeam: string;
@@ -97,6 +100,12 @@ export function OngoingPredictions({
   locale,
   labels,
 }: OngoingPredictionsProps) {
+  const [timeZone, setTimeZone] = useState("UTC");
+
+  useEffect(() => {
+    setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
+
   if (matches.length === 0) {
     return null;
   }
@@ -121,6 +130,7 @@ export function OngoingPredictions({
           const homeTeam = getCountryLabel(match.homeTeam, locale);
           const awayTeam = getCountryLabel(match.awayTeam, locale);
           const hasScore = match.homeScore !== null && match.awayScore !== null;
+          const kickoffAt = new Date(match.kickoffAt);
 
           return (
             <div
@@ -136,7 +146,11 @@ export function OngoingPredictions({
                     {homeTeam} vs {awayTeam}
                   </h3>
                   <p className="mt-1 text-sm text-slate-600">
-                    {formatKickoff(match.kickoffAt, locale)}
+                    {formatKickoff(
+                      kickoffAt,
+                      locale === "es" ? "es-ES" : "en-US",
+                      timeZone,
+                    )}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-ink">

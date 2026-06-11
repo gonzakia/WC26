@@ -154,6 +154,7 @@ export default async function Home() {
               tomorrow: t.home.tomorrow,
               venueTbd: t.common.venueTbd,
               open: t.common.open,
+              locked: t.common.locked,
               noUpcomingMatches: t.home.noUpcomingMatches,
             }}
           />
