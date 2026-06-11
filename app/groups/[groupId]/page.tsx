@@ -8,7 +8,6 @@ import { OngoingPredictions } from "@/components/ongoing-predictions";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getGroupPageData } from "@/lib/data";
 import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
-import { normalizeRoleLabel } from "@/lib/tournament";
 
 type GroupPageProps = {
   params: Promise<{
@@ -158,9 +157,6 @@ export default async function GroupPage({ params }: GroupPageProps) {
                   <span className="font-semibold">#{index + 1}</span>
                   <div>
                     <p className="font-medium">{entry.name}</p>
-                    <p className="text-xs uppercase tracking-[0.15em] text-slate-500">
-                      {normalizeRoleLabel(entry.role, locale)}
-                    </p>
                   </div>
                   <span>{entry.exact}</span>
                   <span>{entry.outcomes}</span>
@@ -175,18 +171,20 @@ export default async function GroupPage({ params }: GroupPageProps) {
           </div>
         </section>
 
-        <GroupManagement
-          currentUserRole={membership.role}
-          groupId={group.id}
-          labels={t.groupPage.management}
-          members={group.members.map((member) => ({
-            id: member.id,
-            userId: member.userId,
-            role: member.role,
-            name: member.displayName?.trim() || member.user.displayName,
-            isCurrentUser: member.userId === currentUser.id,
-          }))}
-        />
+        {membership.role === "OWNER" ? (
+          <GroupManagement
+            currentUserRole={membership.role}
+            groupId={group.id}
+            labels={t.groupPage.management}
+            members={group.members.map((member) => ({
+              id: member.id,
+              userId: member.userId,
+              role: member.role,
+              name: member.displayName?.trim() || member.user.displayName,
+              isCurrentUser: member.userId === currentUser.id,
+            }))}
+          />
+        ) : null}
       </div>
     </main>
   );

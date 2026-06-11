@@ -160,7 +160,7 @@ export function OngoingPredictions({
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-4 grid max-w-4xl gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {members.map((member) => {
                   const prediction = member.user.predictions.find(
                     (candidate) => candidate.matchId === match.id,
@@ -171,22 +171,24 @@ export function OngoingPredictions({
 
                   return (
                     <div
-                      className={`rounded-2xl border px-4 py-3 text-sm transition ${getPredictionClass(status)}`}
+                      className={`rounded-2xl border px-3 py-2 text-sm transition ${getPredictionClass(status)}`}
                       key={member.id}
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <p className="font-semibold">{memberName}</p>
-                        {status ? (
-                          <span className="rounded-full bg-white/65 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em]">
-                            {status === "exact" ? labels.exact : labels.outcome}
+                        <p className="min-w-0 truncate font-semibold">{memberName}</p>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="text-base font-semibold">
+                            {prediction
+                              ? `${prediction.predictedHome}-${prediction.predictedAway}`
+                              : labels.noPick}
                           </span>
-                        ) : null}
+                          {status ? (
+                            <span className="rounded-full bg-white/65 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em]">
+                              {status === "exact" ? labels.exact : labels.outcome}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
-                      <p className="mt-2 text-lg font-semibold">
-                        {prediction
-                          ? `${prediction.predictedHome}-${prediction.predictedAway}`
-                          : labels.noPick}
-                      </p>
                     </div>
                   );
                 })}
