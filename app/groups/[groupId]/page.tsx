@@ -172,27 +172,39 @@ export default async function GroupPage({ params }: GroupPageProps) {
                 <span>{t.groupPage.total}</span>
               </div>
 
-              {leaderboard.map((entry, index) => (
-                <div
-                  key={entry.id}
-                  className="grid grid-cols-[0.55fr_1.8fr_1fr_1fr_1fr] items-center border-t border-black/5 bg-white px-4 py-4 text-sm text-slate-800"
-                >
-                  <span className="font-semibold">#{index + 1}</span>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-medium">{entry.name}</p>
-                      {entry.id === membership.id ? (
-                        <span className="rounded-full bg-pitch-50 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-pitch-800">
-                          {t.groupPage.management.youBadge}
-                        </span>
-                      ) : null}
+              {leaderboard.map((entry, index) => {
+                const previousEntry = leaderboard[index - 1];
+                const tiedWithPrevious =
+                  previousEntry &&
+                  previousEntry.total === entry.total;
+                const rank = tiedWithPrevious
+                  ? leaderboard.findIndex(
+                      (candidate) => candidate.total === entry.total,
+                    ) + 1
+                  : index + 1;
+
+                return (
+                  <div
+                    key={entry.id}
+                    className="grid grid-cols-[0.55fr_1.8fr_1fr_1fr_1fr] items-center border-t border-black/5 bg-white px-4 py-4 text-sm text-slate-800"
+                  >
+                    <span className="font-semibold">#{rank}</span>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium">{entry.name}</p>
+                        {entry.id === membership.id ? (
+                          <span className="rounded-full bg-pitch-50 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-pitch-800">
+                            {t.groupPage.management.youBadge}
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
+                    <span>{entry.exact}</span>
+                    <span>{entry.outcomes}</span>
+                    <span className="font-semibold text-pitch-700">{entry.total}</span>
                   </div>
-                  <span>{entry.exact}</span>
-                  <span>{entry.outcomes}</span>
-                  <span className="font-semibold text-pitch-700">{entry.total}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="mt-6 rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-700">
