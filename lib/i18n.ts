@@ -179,6 +179,25 @@ export const translations = {
       exact: "Exact",
       outcome: "Outcome",
       total: "Total",
+      management: {
+        title: "Manage group",
+        ownerTools: "Group settings",
+        ownerToolsCopy:
+          "Owners can remove members or delete the group. Any member can leave. Leaving or being removed deletes that member's predictions in this group.",
+        transferOwner: "Choose a new owner before leaving",
+        transferOwnerPlaceholder: "Select a member",
+        removeMember: "Remove member",
+        leaveGroup: "Leave group",
+        deleteGroup: "Delete group",
+        ownerBadge: "Owner",
+        youBadge: "You",
+        leaveWarning:
+          "Are you sure you want to leave this group? All predictions you entered in this group will be lost.",
+        removeWarning:
+          "Are you sure you want to remove this member? All predictions they entered in this group will be lost.",
+        deleteWarning:
+          "Are you sure you want to delete this group? All members and all predictions entered in this group will be lost.",
+      },
     },
     matchBrowser: {
       toggleMenu: "Toggle Menu",
@@ -382,6 +401,25 @@ export const translations = {
       exact: "Exacto",
       outcome: "Resultado",
       total: "Total",
+      management: {
+        title: "Administrar grupo",
+        ownerTools: "Configuración del grupo",
+        ownerToolsCopy:
+          "La persona dueña puede eliminar miembros o borrar el grupo. Cualquier miembro puede salir. Al salir o ser eliminado se borran sus predicciones en este grupo.",
+        transferOwner: "Elige una nueva persona dueña antes de salir",
+        transferOwnerPlaceholder: "Selecciona un miembro",
+        removeMember: "Eliminar miembro",
+        leaveGroup: "Salir del grupo",
+        deleteGroup: "Borrar grupo",
+        ownerBadge: "Dueño",
+        youBadge: "Tú",
+        leaveWarning:
+          "¿Seguro que quieres salir de este grupo? Se perderán todas las predicciones que ingresaste en este grupo.",
+        removeWarning:
+          "¿Seguro que quieres eliminar este miembro? Se perderán todas las predicciones que ingresó en este grupo.",
+        deleteWarning:
+          "¿Seguro que quieres borrar este grupo? Se perderán todos los miembros y todas las predicciones ingresadas en este grupo.",
+      },
     },
     matchBrowser: {
       toggleMenu: "Menu desplegable",
@@ -455,10 +493,6 @@ export function stripLocalePrefix(pathname: string) {
 
 export function localizePath(pathname: string, locale: Locale) {
   const stripped = stripLocalePrefix(pathname);
-
-  if (locale === defaultLocale) {
-    return stripped;
-  }
 
   return stripped === "/" ? `/${locale}` : `/${locale}${stripped}`;
 }

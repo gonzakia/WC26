@@ -20,6 +20,9 @@ compete on group-specific leaderboards.
 
 - Passwordless login and registration with one-time verification codes.
 - Private group creation and invite-code based joining.
+- Group owner tools for removing members, transferring ownership, and deleting
+  groups.
+- Member self-service for leaving a group.
 - Group-specific display names through `GroupMember.displayName`.
 - Separate predictions per group, so the same user can make different picks in
   different groups.

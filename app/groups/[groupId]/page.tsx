@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Trophy, Users } from "lucide-react";
 import { SignOutButton } from "@/components/auth-forms";
+import { GroupManagement } from "@/components/group-management";
 import { MatchBrowser } from "@/components/match-browser";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getGroupPageData } from "@/lib/data";
@@ -150,6 +151,19 @@ export default async function GroupPage({ params }: GroupPageProps) {
             </div>
           </div>
         </section>
+
+        <GroupManagement
+          currentUserRole={membership.role}
+          groupId={group.id}
+          labels={t.groupPage.management}
+          members={group.members.map((member) => ({
+            id: member.id,
+            userId: member.userId,
+            role: member.role,
+            name: member.displayName?.trim() || member.user.displayName,
+            isCurrentUser: member.userId === currentUser.id,
+          }))}
+        />
       </div>
     </main>
   );

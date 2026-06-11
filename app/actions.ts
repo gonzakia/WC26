@@ -53,7 +53,7 @@ export async function setLanguage(formData: FormData) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  redirect(redirectTo);
+  redirect(localizePath(redirectTo, locale as Locale));
 }
 
 export async function signInOrCreateUser(formData: FormData) {
@@ -236,6 +236,171 @@ export async function joinGroup(formData: FormData) {
   revalidatePath("/");
   revalidatePath(`/groups/${group.id}`);
   redirect(localizePath(`/groups/${group.id}`, await getLocale()));
+}
+
+async function requireGroupOwner(groupId: string, userId: string) {
+  const membership = await prisma.groupMember.findUnique({
+    where: {
+      userId_groupId: {
+        userId,
+        groupId,
+      },
+    },
+  });
+
+  if (membership?.role !== "OWNER") {
+    throw new Error("Only the group owner can manage members.");
+  }
+
+  return membership;
+}
+
+export async function removeGroupMember(formData: FormData) {
+  const currentUser = await requireCurrentUser();
+  const groupId = parseText(formData.get("groupId"));
+  const targetUserId = parseText(formData.get("targetUserId"));
+
+  if (!groupId || !targetUserId) {
+    throw new Error("Group and member are required.");
+  }
+
+  await requireGroupOwner(groupId, currentUser.id);
+
+  if (targetUserId === currentUser.id) {
+    throw new Error("Use the leave group action to leave your own group.");
+  }
+
+  const targetMembership = await prisma.groupMember.findUnique({
+    where: {
+      userId_groupId: {
+        userId: targetUserId,
+        groupId,
+      },
+    },
+  });
+
+  if (!targetMembership) {
+    throw new Error("That member is not in this group.");
+  }
+
+  await prisma.$transaction([
+    prisma.prediction.deleteMany({
+      where: {
+        groupId,
+        userId: targetUserId,
+      },
+    }),
+    prisma.groupMember.delete({
+      where: {
+        userId_groupId: {
+          userId: targetUserId,
+          groupId,
+        },
+      },
+    }),
+  ]);
+
+  revalidatePath("/");
+  revalidatePath(`/groups/${groupId}`);
+}
+
+export async function leaveGroup(formData: FormData) {
+  const currentUser = await requireCurrentUser();
+  const groupId = parseText(formData.get("groupId"));
+  const newOwnerUserId = parseText(formData.get("newOwnerUserId"));
+
+  if (!groupId) {
+    throw new Error("Group is required.");
+  }
+
+  const membership = await prisma.groupMember.findUnique({
+    where: {
+      userId_groupId: {
+        userId: currentUser.id,
+        groupId,
+      },
+    },
+  });
+
+  if (!membership) {
+    throw new Error("You are not a member of this group.");
+  }
+
+  if (membership.role === "OWNER") {
+    if (!newOwnerUserId || newOwnerUserId === currentUser.id) {
+      throw new Error("Choose a new owner before leaving this group.");
+    }
+
+    const newOwnerMembership = await prisma.groupMember.findUnique({
+      where: {
+        userId_groupId: {
+          userId: newOwnerUserId,
+          groupId,
+        },
+      },
+    });
+
+    if (!newOwnerMembership) {
+      throw new Error("The new owner must be a member of this group.");
+    }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    if (membership.role === "OWNER") {
+      await tx.group.update({
+        where: { id: groupId },
+        data: { creatorId: newOwnerUserId },
+      });
+      await tx.groupMember.update({
+        where: {
+          userId_groupId: {
+            userId: newOwnerUserId,
+            groupId,
+          },
+        },
+        data: { role: "OWNER" },
+      });
+    }
+
+    await tx.prediction.deleteMany({
+      where: {
+        groupId,
+        userId: currentUser.id,
+      },
+    });
+    await tx.groupMember.delete({
+      where: {
+        userId_groupId: {
+          userId: currentUser.id,
+          groupId,
+        },
+      },
+    });
+  });
+
+  revalidatePath("/");
+  revalidatePath(`/groups/${groupId}`);
+  redirect(localizePath("/", await getLocale()));
+}
+
+export async function deleteGroup(formData: FormData) {
+  const currentUser = await requireCurrentUser();
+  const groupId = parseText(formData.get("groupId"));
+
+  if (!groupId) {
+    throw new Error("Group is required.");
+  }
+
+  await requireGroupOwner(groupId, currentUser.id);
+
+  await prisma.$transaction([
+    prisma.prediction.deleteMany({ where: { groupId } }),
+    prisma.groupMember.deleteMany({ where: { groupId } }),
+    prisma.group.delete({ where: { id: groupId } }),
+  ]);
+
+  revalidatePath("/");
+  redirect(localizePath("/", await getLocale()));
 }
 
 export async function savePrediction(formData: FormData) {
