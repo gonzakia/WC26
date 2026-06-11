@@ -156,7 +156,14 @@ export default async function GroupPage({ params }: GroupPageProps) {
                 >
                   <span className="font-semibold">#{index + 1}</span>
                   <div>
-                    <p className="font-medium">{entry.name}</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-medium">{entry.name}</p>
+                      {entry.id === membership.id ? (
+                        <span className="rounded-full bg-pitch-50 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-pitch-800">
+                          {t.groupPage.management.youBadge}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                   <span>{entry.exact}</span>
                   <span>{entry.outcomes}</span>
