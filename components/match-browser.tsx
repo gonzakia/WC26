@@ -175,6 +175,20 @@ function getFlagEmoji(teamName: string) {
   return matchedKey ? FLAG_EMOJIS[matchedKey] : "🏳️";
 }
 
+function getLocalDateKey(date: Date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function getInitialDateKey(dates: Array<{ key: string }>) {
+  const todayKey = getLocalDateKey(new Date());
+
+  return dates.find((section) => section.key === todayKey)?.key ?? dates[0]?.key ?? null;
+}
+
 function MatchItem({
   match,
   groupId,
@@ -289,7 +303,9 @@ export function MatchBrowser({
     }));
 
   const [openPrimary, setOpenPrimary] = useState<"date" | "stage">("date");
-  const [openDateKey, setOpenDateKey] = useState<string | null>(dates[0]?.key ?? null);
+  const [openDateKey, setOpenDateKey] = useState<string | null>(() =>
+    getInitialDateKey(dates),
+  );
   const [stageMode, setStageMode] = useState<"group" | "knockout">("group");
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
   const [activeRound, setActiveRound] = useState<string | null>(
