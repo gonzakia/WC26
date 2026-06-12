@@ -16,6 +16,10 @@ type UpcomingMatch = {
   venue: string | null;
   homeTeam: string;
   awayTeam: string;
+  homeScore: number | null;
+  awayScore: number | null;
+  resultConfirmed: boolean;
+  status: string;
 };
 
 type NormalizedUpcomingMatch = Omit<UpcomingMatch, "kickoffAt"> & {
@@ -32,11 +36,15 @@ type UpcomingMatchesSnapshotProps = {
     today: string;
     tomorrow: string;
     venueTbd: string;
-    open: string;
-    locked: string;
+    live: string;
+    finished: string;
+    upcoming: string;
     noUpcomingMatches: string;
   };
 };
+
+const LIVE_MATCH_STATUSES = new Set(["IN_PLAY", "PAUSED", "LIVE"]);
+const FINISHED_MATCH_STATUSES = new Set(["FINISHED", "AWARDED"]);
 
 function getLocalDateKey(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -155,7 +163,15 @@ export function UpcomingMatchesSnapshot({
               </div>
               <div className="mt-3 space-y-3">
                 {group.matches.map((match) => {
-                  const locked = match.kickoffAt <= now;
+                  const hasScore =
+                    match.homeScore !== null && match.awayScore !== null;
+                  const statusLabel =
+                    LIVE_MATCH_STATUSES.has(match.status)
+                      ? labels.live
+                      : FINISHED_MATCH_STATUSES.has(match.status) ||
+                          match.resultConfirmed
+                        ? labels.finished
+                        : labels.upcoming;
 
                   return (
                     <article
@@ -189,9 +205,16 @@ export function UpcomingMatchesSnapshot({
                           </div>
                         </div>
 
-                        <span className="shrink-0 rounded-full bg-pitch-400/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pitch-100">
-                          {locked ? labels.locked : labels.open}
-                        </span>
+                        <div className="flex shrink-0 flex-col items-end gap-2">
+                          <span className="rounded-full bg-pitch-400/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pitch-100">
+                            {statusLabel}
+                          </span>
+                          {hasScore ? (
+                            <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-ink">
+                              {match.homeScore}-{match.awayScore}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
                     </article>
                   );

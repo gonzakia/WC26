@@ -308,6 +308,7 @@ function MatchItem({
             labels={labels.predictionDetails}
             match={match}
             members={members}
+            showStatusBadge={false}
           />
         </div>
       ) : null}

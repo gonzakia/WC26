@@ -132,10 +132,12 @@ export function GroupPredictionList({
   labels,
   match,
   members,
+  showStatusBadge = true,
 }: {
   labels: GroupPredictionListLabels;
   match: GroupPredictionMatch;
   members: GroupPredictionMember[];
+  showStatusBadge?: boolean;
 }) {
   const orderedMembers = members
     .map((member) => {
@@ -173,22 +175,28 @@ export function GroupPredictionList({
     });
 
   return (
-    <div className="grid max-w-4xl gap-2 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid w-full min-w-0 max-w-4xl grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
       {orderedMembers.map(({ member, memberName, prediction, status }) => (
         <div
-          className={`rounded-2xl border px-3 py-2 text-sm transition ${getPredictionClass(status)}`}
+          className={`min-w-0 rounded-2xl border px-2.5 py-2 text-[0.8rem] transition sm:px-3 sm:text-sm ${getPredictionClass(status)}`}
           key={member.id}
         >
-          <div className="flex items-center justify-between gap-3">
-            <p className="min-w-0 truncate font-semibold">{memberName}</p>
-            <div className="flex shrink-0 items-center gap-2">
-              <span className="text-base font-semibold">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <p className="min-w-0 overflow-hidden break-words font-semibold [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+              {memberName}
+            </p>
+            <div className="flex min-w-0 shrink-0 items-center gap-1.5">
+              <span className="text-sm font-semibold sm:text-base">
                 {prediction
                   ? `${prediction.predictedHome}-${prediction.predictedAway}`
                   : labels.noPick}
               </span>
-              {status ? (
-                <span className="rounded-full bg-white/65 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em]">
+              {status && showStatusBadge ? (
+                <span
+                  aria-label={status === "exact" ? labels.exact : labels.outcome}
+                  className="rounded-full bg-white/65 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em]"
+                  title={status === "exact" ? labels.exact : labels.outcome}
+                >
                   {status === "exact" ? labels.exact : labels.outcome}
                 </span>
               ) : null}
