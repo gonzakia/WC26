@@ -133,11 +133,13 @@ export function GroupPredictionList({
   match,
   members,
   showStatusBadge = true,
+  useFourColumns = false,
 }: {
   labels: GroupPredictionListLabels;
   match: GroupPredictionMatch;
   members: GroupPredictionMember[];
   showStatusBadge?: boolean;
+  useFourColumns?: boolean;
 }) {
   const orderedMembers = members
     .map((member) => {
@@ -175,7 +177,11 @@ export function GroupPredictionList({
     });
 
   return (
-    <div className="grid w-full min-w-0 max-w-4xl grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+    <div
+      className={`grid w-full min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 ${
+        useFourColumns ? "xl:grid-cols-4" : "xl:max-w-4xl"
+      }`}
+    >
       {orderedMembers.map(({ member, memberName, prediction, status }) => (
         <div
           className={`min-w-0 rounded-2xl border px-2.5 py-2 text-[0.8rem] transition sm:px-3 sm:text-sm ${getPredictionClass(status)}`}

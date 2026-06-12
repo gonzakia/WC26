@@ -120,6 +120,7 @@ export function OngoingPredictions({
                   labels={labels}
                   match={match}
                   members={members}
+                  useFourColumns
                 />
               </div>
             </div>
