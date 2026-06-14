@@ -5,6 +5,7 @@ import { SignOutButton } from "@/components/auth-forms";
 import { GroupManagement } from "@/components/group-management";
 import { MatchBrowser } from "@/components/match-browser";
 import { OngoingPredictions } from "@/components/ongoing-predictions";
+import { PredictionReadiness } from "@/components/prediction-readiness";
 import { SettingsMenu } from "@/components/settings-menu";
 import { getGroupPageData } from "@/lib/data";
 import { getLocale, getTranslations, localizePath } from "@/lib/i18n";
@@ -16,6 +17,7 @@ type GroupPageProps = {
 };
 
 const FALLBACK_ONGOING_MATCH_WINDOW_MS = 3 * 60 * 60 * 1000;
+const PREDICTION_READINESS_WINDOW_MS = 60 * 60 * 1000;
 const LIVE_MATCH_STATUSES = new Set(["IN_PLAY", "PAUSED", "LIVE"]);
 const FINISHED_MATCH_STATUSES = new Set(["FINISHED", "AWARDED"]);
 
@@ -56,6 +58,22 @@ export default async function GroupPage({ params }: GroupPageProps) {
     return (
       kickoffTime <= now.getTime() &&
       kickoffTime + FALLBACK_ONGOING_MATCH_WINDOW_MS >= now.getTime()
+    );
+  });
+  const readinessMatches = matches.filter((match) => {
+    const kickoffTime = match.kickoffAt.getTime();
+
+    if (
+      LIVE_MATCH_STATUSES.has(match.status) ||
+      FINISHED_MATCH_STATUSES.has(match.status) ||
+      match.resultConfirmed
+    ) {
+      return false;
+    }
+
+    return (
+      kickoffTime > now.getTime() &&
+      kickoffTime - PREDICTION_READINESS_WINDOW_MS <= now.getTime()
     );
   });
 
@@ -108,6 +126,13 @@ export default async function GroupPage({ params }: GroupPageProps) {
             </div>
           </div>
         </section>
+
+        <PredictionReadiness
+          labels={t.groupPage.predictionReadiness}
+          locale={locale}
+          matches={readinessMatches}
+          members={predictionMembers}
+        />
 
         <OngoingPredictions
           labels={t.groupPage.ongoingPredictions}

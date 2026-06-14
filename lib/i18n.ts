@@ -185,6 +185,14 @@ export const translations = {
       exact: "Exact",
       outcome: "Outcome",
       total: "Total",
+      predictionReadiness: {
+        eyebrow: "Upcoming kickoff",
+        title: "Pick status",
+        copy:
+          "Starting one hour before kickoff, see who has submitted a pick for the match. Actual predictions stay hidden until the game starts.",
+        ready: "Ready",
+        pending: "Pending",
+      },
       ongoingPredictions: {
         eyebrow: "Live picks",
         title: "Predictions for the current match",
@@ -427,6 +435,14 @@ export const translations = {
       exact: "Exacto",
       outcome: "Resultado",
       total: "Total",
+      predictionReadiness: {
+        eyebrow: "Próximo inicio",
+        title: "Estado de predicciones",
+        copy:
+          "Desde una hora antes del inicio, puedes ver quién ya envió su predicción para el partido. Los marcadores siguen ocultos hasta que empiece el juego.",
+        ready: "Lista",
+        pending: "Pendiente",
+      },
       ongoingPredictions: {
         eyebrow: "Predicciones en vivo",
         title: "Predicciones del partido actual",
