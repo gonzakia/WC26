@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Clock3, MapPin } from "lucide-react";
+import { LiveScoreRefresher } from "@/components/live-score-refresher";
 import { getCountryLabel } from "@/lib/country-labels";
 import { formatKickoff } from "@/lib/date";
 import { getMatchVenue } from "@/lib/manual-venues";
@@ -140,6 +141,7 @@ export function UpcomingMatchesSnapshot({
 
   return (
     <section className="rounded-[2rem] border border-white/60 bg-[#0d1f17] p-6 text-white shadow-glow">
+      <LiveScoreRefresher />
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-200">

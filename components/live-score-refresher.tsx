@@ -24,7 +24,7 @@ export function LiveScoreRefresher() {
     }
 
     refreshLiveScores();
-    const interval = window.setInterval(refreshLiveScores, 60 * 1000);
+    const interval = window.setInterval(refreshLiveScores, 30 * 1000);
 
     return () => {
       active = false;

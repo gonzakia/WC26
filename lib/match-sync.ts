@@ -41,6 +41,7 @@ type SyncWorldCupMatchesOptions = {
 const LIVE_MATCH_STATUSES = new Set(["LIVE", "IN_PLAY", "PAUSED"]);
 const LIVE_SYNC_BEFORE_KICKOFF_MS = 15 * 60 * 1000;
 const LIVE_SYNC_AFTER_KICKOFF_MS = 4 * 60 * 60 * 1000;
+const LIVE_SYNC_THROTTLE_MS = 20 * 1000;
 
 function slugifyPart(value: string) {
   return value
@@ -278,7 +279,7 @@ export async function syncWorldCupMatches(options: SyncWorldCupMatchesOptions = 
 
 export async function syncLiveWorldCupMatches() {
   const now = new Date();
-  const staleBefore = new Date(now.getTime() - 60 * 1000);
+  const staleBefore = new Date(now.getTime() - LIVE_SYNC_THROTTLE_MS);
   const liveWindowStart = new Date(now.getTime() - LIVE_SYNC_AFTER_KICKOFF_MS);
   const liveWindowEnd = new Date(now.getTime() + LIVE_SYNC_BEFORE_KICKOFF_MS);
   const candidateMatches = await prisma.match.findMany({
@@ -319,7 +320,7 @@ export async function syncLiveWorldCupMatches() {
   if (!needsSync) {
     return {
       skipped: true,
-      reason: "Live matches were synced less than a minute ago.",
+      reason: "Live matches were synced recently.",
       syncedAt: now,
       provider: "football-data.org",
     };
