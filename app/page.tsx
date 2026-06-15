@@ -92,7 +92,10 @@ export default async function Home() {
         </header>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="rounded-[2rem] border border-ink/10 bg-white/75 p-8 shadow-glow backdrop-blur">
+          <section
+            className="scroll-mt-8 rounded-[2rem] border border-ink/10 bg-white/75 p-8 shadow-glow backdrop-blur"
+            id="rules"
+          >
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
               {t.home.rulesEyebrow}
             </p>
@@ -140,32 +143,37 @@ export default async function Home() {
 
           </section>
 
-          <UpcomingMatchesSnapshot
-            matches={matches.map((match) => ({
-              ...match,
-              kickoffAt: match.kickoffAt.toISOString(),
-            }))}
-            locale={locale}
-            labels={{
-              snapshot: t.home.snapshot,
-              upcomingMatches: t.home.upcomingMatches,
-              snapshotCopy: t.home.snapshotCopy,
-              today: t.home.today,
-              tomorrow: t.home.tomorrow,
-              venueTbd: t.common.venueTbd,
-              live: t.home.live,
-              finished: t.home.finished,
-              upcoming: t.home.upcoming,
-              noUpcomingMatches: t.home.noUpcomingMatches,
-            }}
-          />
+          <div className="scroll-mt-8" id="matchday-snapshot">
+            <UpcomingMatchesSnapshot
+              matches={matches.map((match) => ({
+                ...match,
+                kickoffAt: match.kickoffAt.toISOString(),
+              }))}
+              locale={locale}
+              labels={{
+                snapshot: t.home.snapshot,
+                upcomingMatches: t.home.upcomingMatches,
+                snapshotCopy: t.home.snapshotCopy,
+                today: t.home.today,
+                tomorrow: t.home.tomorrow,
+                venueTbd: t.common.venueTbd,
+                live: t.home.live,
+                finished: t.home.finished,
+                upcoming: t.home.upcoming,
+                noUpcomingMatches: t.home.noUpcomingMatches,
+              }}
+            />
+          </div>
         </div>
 
         <section
           id="dashboard"
           className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]"
         >
-          <div className="rounded-[2rem] border border-ink/10 bg-white/75 p-8 shadow-glow backdrop-blur">
+          <div
+            className="scroll-mt-8 rounded-[2rem] border border-ink/10 bg-white/75 p-8 shadow-glow backdrop-blur"
+            id="my-groups"
+          >
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
               {t.home.yourGroups}
             </p>
@@ -210,30 +218,34 @@ export default async function Home() {
           </div>
 
           <div className="grid gap-6">
-            <SectionCard eyebrow={t.home.create} title={t.home.startPrivateGroup}>
-              <CreateGroupForm
-                defaultDisplayName={currentUser.displayName}
-                displayNameFieldId="create-group-display-name"
-                labels={{
-                  ...t.groupForms,
-                  noGroupsYet: t.common.noGroupsYet,
-                  noGroupsCopy: t.common.noGroupsCopy,
-                  openGroup: t.common.openGroup,
-                }}
-              />
-            </SectionCard>
-            <SectionCard eyebrow={t.home.join} title={t.home.enterInviteCode}>
-              <JoinGroupForm
-                defaultDisplayName={currentUser.displayName}
-                displayNameFieldId="join-group-display-name"
-                labels={{
-                  ...t.groupForms,
-                  noGroupsYet: t.common.noGroupsYet,
-                  noGroupsCopy: t.common.noGroupsCopy,
-                  openGroup: t.common.openGroup,
-                }}
-              />
-            </SectionCard>
+            <div className="scroll-mt-8" id="create-group">
+              <SectionCard eyebrow={t.home.create} title={t.home.startPrivateGroup}>
+                <CreateGroupForm
+                  defaultDisplayName={currentUser.displayName}
+                  displayNameFieldId="create-group-display-name"
+                  labels={{
+                    ...t.groupForms,
+                    noGroupsYet: t.common.noGroupsYet,
+                    noGroupsCopy: t.common.noGroupsCopy,
+                    openGroup: t.common.openGroup,
+                  }}
+                />
+              </SectionCard>
+            </div>
+            <div className="scroll-mt-8" id="join-group">
+              <SectionCard eyebrow={t.home.join} title={t.home.enterInviteCode}>
+                <JoinGroupForm
+                  defaultDisplayName={currentUser.displayName}
+                  displayNameFieldId="join-group-display-name"
+                  labels={{
+                    ...t.groupForms,
+                    noGroupsYet: t.common.noGroupsYet,
+                    noGroupsCopy: t.common.noGroupsCopy,
+                    openGroup: t.common.openGroup,
+                  }}
+                />
+              </SectionCard>
+            </div>
           </div>
         </section>
       </section>
