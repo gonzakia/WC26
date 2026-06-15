@@ -30,7 +30,7 @@ export default async function AdminResultsPage() {
   ]);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#faf5ea_0%,#f0e6d3_100%)] px-6 py-10 lg:px-10">
+    <main className="bg-app min-h-screen px-6 py-10 lg:px-10">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link

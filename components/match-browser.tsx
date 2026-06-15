@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   ChevronDown,
@@ -234,24 +234,24 @@ function MatchItem({
   const venue = getMatchVenue(match, locale);
 
   return (
-    <div className="rounded-[1.75rem] border border-black/5 bg-pitch-200/100 p-5">
+    <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 text-left transition hover:bg-white/10">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#0d1f17]">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-pitch-200">
               {normalizeStageLabel(match.stage, language)}
             </p>
             {match.groupName ? (
-              <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">
+              <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-100">
                 {match.groupName.replace('_', ' ')}
               </span>
             ) : null}
           </div>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="mt-2 text-sm font-medium text-slate-100">
             {formatKickoff(match.kickoffAt, locale)}
             {venue ? <> · {venue}</> : null}
           </p>
-          <h3 className="mt-3 text-2xl font-semibold text-ink">
+          <h3 className="mt-3 text-2xl font-semibold text-white">
             {homeTeam} vs {awayTeam}
           </h3>
           
@@ -259,11 +259,11 @@ function MatchItem({
           match.homeScore !== null &&
           match.awayScore !== null ? (
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <p className="text-sm font-medium text-pitch-800">
+              <p className="text-sm font-medium text-pitch-100">
                 {labels.common.finalScore}: {match.homeScore} - {match.awayScore}
               </p>
               <button
-                className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-pitch-900 transition hover:bg-pitch-50"
+                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20"
                 onClick={() => setShowDetailedPredictions((current) => !current)}
                 type="button"
               >
@@ -276,7 +276,7 @@ function MatchItem({
           ) : null}
         </div>
 
-        <div className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">
+        <div className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-100">
           {locked ? labels.common.locked : labels.common.open}
         </div>
       </div>
@@ -303,7 +303,7 @@ function MatchItem({
       </div>
 
       {showDetailedPredictions ? (
-        <div className="mt-5 rounded-3xl border border-black/5 bg-slate-50 p-4">
+        <div className="mt-5 rounded-3xl border border-white/10 bg-white/5 p-4">
           <GroupPredictionList
             labels={labels.predictionDetails}
             match={match}
@@ -353,10 +353,24 @@ export function MatchBrowser({
   const [activeRound, setActiveRound] = useState<string | null>(
     knockoutRounds[0]?.stage ?? null,
   );
+  const dateScrollRef = useRef<HTMLDivElement>(null);
+  const activeDateButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (openPrimary !== "date") {
+      return;
+    }
+
+    activeDateButtonRef.current?.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [openDateKey, openPrimary]);
 
   return (
     <div className="mt-6 min-w-0 space-y-6">
-      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#0d1f17] text-white">
+      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[rgb(var(--color-panel-soft)/1)] text-white">
         <button
           className="flex w-full items-center justify-between px-5 py-4 text-left"
           onClick={() => setOpenPrimary(openPrimary === "date" ? "stage" : "date")}
@@ -378,11 +392,12 @@ export function MatchBrowser({
 
         {openPrimary === "date" ? (
           <div className="min-w-0 border-t border-white/10 px-5 pb-5 pt-4">
-            <div className="w-full min-w-0 overflow-x-auto pb-1">
+            <div className="w-full min-w-0 overflow-x-auto pb-1" ref={dateScrollRef}>
               <div className="flex flex-nowrap gap-3">
                 {dates.map((section) => (
                   <button
                     key={section.key}
+                    ref={openDateKey === section.key ? activeDateButtonRef : null}
                     className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${
                       openDateKey === section.key
                         ? "bg-white text-ink"
@@ -419,7 +434,7 @@ export function MatchBrowser({
         ) : null}
       </section>
 
-      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[#10261b] text-white">
+      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[rgb(var(--color-panel-soft)/1)] text-white">
         <button
           className="flex w-full items-center justify-between px-5 py-4 text-left"
           onClick={() => setOpenPrimary(openPrimary === "stage" ? "date" : "stage")}

@@ -140,7 +140,7 @@ export function UpcomingMatchesSnapshot({
   }, []);
 
   return (
-    <section className="rounded-[2rem] border border-white/60 bg-[#0d1f17] p-6 text-white shadow-glow">
+    <section className="rounded-[2rem] border border-white/60 bg-[rgb(var(--color-panel)/1)] p-6 text-white shadow-glow">
       <LiveScoreRefresher />
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -160,7 +160,7 @@ export function UpcomingMatchesSnapshot({
         {groupedMatches.length ? (
           groupedMatches.map((group) => (
             <div key={group.label}>
-              <div className="sticky top-0 z-10 rounded-full bg-[#0d1f17]/95 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-pitch-100">
+              <div className="sticky top-0 z-10 rounded-full bg-[rgb(var(--color-panel)/0.95)] py-2 text-xs font-semibold uppercase tracking-[0.22em] text-pitch-100">
                 {group.label}
               </div>
               <div className="mt-3 space-y-3">
@@ -208,7 +208,7 @@ export function UpcomingMatchesSnapshot({
                         </div>
 
                         <div className="flex shrink-0 flex-col items-end gap-2">
-                          <span className="rounded-full bg-pitch-400/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pitch-100">
+                          <span className="rounded-full border border-transparent bg-pitch-400/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-pitch-100">
                             {statusLabel}
                           </span>
                           {hasScore ? (

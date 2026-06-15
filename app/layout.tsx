@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist } from "next/font/google";
 import { getLocale, getTranslations } from "@/lib/i18n";
+import {
+  defaultThemeColor,
+  defaultThemeMode,
+  isThemeColor,
+  isThemeMode,
+  themeColorCookieName,
+  themeModeCookieName,
+} from "@/lib/themes";
 import "./globals.css";
 
 const geist = Geist({
@@ -20,9 +29,18 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const t = getTranslations(locale);
+  const cookieStore = await cookies();
+  const themeColorCookie = cookieStore.get(themeColorCookieName)?.value;
+  const themeModeCookie = cookieStore.get(themeModeCookieName)?.value;
+  const themeColor = isThemeColor(themeColorCookie)
+    ? themeColorCookie
+    : defaultThemeColor;
+  const themeMode = isThemeMode(themeModeCookie)
+    ? themeModeCookie
+    : defaultThemeMode;
 
   return (
-    <html lang={locale}>
+    <html data-mode={themeMode} data-theme={themeColor} lang={locale}>
       <body className={geist.variable}>
         <div className="min-h-screen">
           {children}

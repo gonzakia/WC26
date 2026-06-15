@@ -78,7 +78,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
   });
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#faf5ea_0%,#f0e6d3_100%)] px-6 py-10 lg:px-10">
+    <main className="bg-app min-h-screen px-6 py-10 lg:px-10">
       <div className="mx-auto max-w-7xl" id="top">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
@@ -94,7 +94,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
           </div>
         </div>
 
-        <section className="mt-6 rounded-[2rem] border border-white/60 bg-[#0d1f17] p-8 text-white shadow-glow">
+        <section className="mt-6 rounded-[2rem] border border-white/60 bg-[rgb(var(--color-panel)/1)] p-8 text-white shadow-glow">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-200">
