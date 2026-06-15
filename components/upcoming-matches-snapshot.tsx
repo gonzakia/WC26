@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Clock3, MapPin } from "lucide-react";
 import { LiveScoreRefresher } from "@/components/live-score-refresher";
 import { getCountryLabel } from "@/lib/country-labels";
@@ -30,6 +30,7 @@ type NormalizedUpcomingMatch = Omit<UpcomingMatch, "kickoffAt"> & {
 type UpcomingMatchesSnapshotProps = {
   matches: UpcomingMatch[];
   locale: string;
+  matchHeightToId?: string;
   labels: {
     snapshot: string;
     upcomingMatches: string;
@@ -96,13 +97,49 @@ function getDayLabel(
 export function UpcomingMatchesSnapshot({
   matches,
   locale,
+  matchHeightToId,
   labels,
 }: UpcomingMatchesSnapshotProps) {
   const [timeZone, setTimeZone] = useState("UTC");
+  const [matchedHeight, setMatchedHeight] = useState<number | null>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
   }, []);
+
+  useEffect(() => {
+    if (!matchHeightToId) {
+      return;
+    }
+
+    const target = document.getElementById(matchHeightToId);
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+
+    if (!target) {
+      return;
+    }
+
+    const targetElement = target;
+
+    function updateHeight() {
+      setMatchedHeight(
+        mediaQuery.matches ? targetElement.getBoundingClientRect().height : null,
+      );
+    }
+
+    updateHeight();
+    const resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(targetElement);
+    mediaQuery.addEventListener("change", updateHeight);
+    window.addEventListener("resize", updateHeight);
+
+    return () => {
+      resizeObserver.disconnect();
+      mediaQuery.removeEventListener("change", updateHeight);
+      window.removeEventListener("resize", updateHeight);
+    };
+  }, [matchHeightToId]);
 
   const now = new Date();
   const normalizedMatches = matches.map((match) => ({
@@ -140,9 +177,12 @@ export function UpcomingMatchesSnapshot({
   }, []);
 
   return (
-    <section className="rounded-[2rem] border border-white/60 bg-[rgb(var(--color-panel)/1)] p-6 text-white shadow-glow">
+    <section
+      className="rounded-[2rem] border border-white/60 bg-[rgb(var(--color-panel)/1)] p-6 text-white shadow-glow"
+      style={matchedHeight ? { maxHeight: matchedHeight } : undefined}
+    >
       <LiveScoreRefresher />
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4" ref={headerRef}>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-200">
             {labels.snapshot}
@@ -156,7 +196,19 @@ export function UpcomingMatchesSnapshot({
         </div>
       </div>
 
-      <div className="mt-5 max-h-[30rem] space-y-5 overflow-y-auto pr-1">
+      <div
+        className="mt-5 max-h-[30rem] space-y-5 overflow-y-auto pr-1"
+        style={
+          matchedHeight
+            ? {
+                maxHeight: Math.max(
+                  240,
+                  matchedHeight - (headerRef.current?.getBoundingClientRect().height ?? 0) - 68,
+                ),
+              }
+            : undefined
+        }
+      >
         {groupedMatches.length ? (
           groupedMatches.map((group) => (
             <div key={group.label}>

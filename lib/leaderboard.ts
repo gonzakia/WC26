@@ -1,4 +1,9 @@
-import { scorePrediction } from "@/lib/scoring";
+import {
+  CORRECT_OUTCOME_POINTS,
+  EXACT_SCORE_POINTS,
+  getBasePredictionPoints,
+  scorePrediction,
+} from "@/lib/scoring";
 
 type LeaderboardPrediction = {
   awardedPoints: number | null;
@@ -6,6 +11,7 @@ type LeaderboardPrediction = {
   predictedAway: number;
   match: {
     resultConfirmed: boolean;
+    stage: string;
     homeScore: number | null;
     awayScore: number | null;
   };
@@ -39,24 +45,24 @@ export function buildLeaderboard(members: LeaderboardMember[]) {
           continue;
         }
 
+        const predictedScore = {
+          homeScore: prediction.predictedHome,
+          awayScore: prediction.predictedAway,
+        };
+        const resultScore = {
+          homeScore: match.homeScore,
+          awayScore: match.awayScore,
+        };
+        const basePoints = getBasePredictionPoints(predictedScore, resultScore);
         const points =
           prediction.awardedPoints ??
-          scorePrediction(
-            {
-              homeScore: prediction.predictedHome,
-              awayScore: prediction.predictedAway,
-            },
-            {
-              homeScore: match.homeScore,
-              awayScore: match.awayScore,
-            },
-          );
+          scorePrediction(predictedScore, resultScore, match.stage);
 
         total += points;
 
-        if (points === 3) {
+        if (basePoints === EXACT_SCORE_POINTS) {
           exact += 1;
-        } else if (points === 1) {
+        } else if (basePoints === CORRECT_OUTCOME_POINTS) {
           outcomes += 1;
         }
       }

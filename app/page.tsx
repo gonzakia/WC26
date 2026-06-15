@@ -91,7 +91,7 @@ export default async function Home() {
           </div>
         </header>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <section
             className="scroll-mt-8 rounded-[2rem] border border-ink/10 bg-white/75 p-8 shadow-glow backdrop-blur"
             id="rules"
@@ -110,6 +110,18 @@ export default async function Home() {
               {[
                 [t.home.exactScoreRule, t.home.exactScoreRuleCopy],
                 [t.home.outcomeRule, t.home.outcomeRuleCopy],
+              ].map(([title, copy]) => (
+                <div
+                  key={title}
+                  className="rounded-2xl border border-black/5 bg-white/70 p-4"
+                >
+                  <p className="text-sm font-semibold text-ink">{title}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {copy}
+                  </p>
+                </div>
+              ))}
+              {[
                 [t.home.deadlineRule, t.home.deadlineRuleCopy],
                 [t.home.separateGroupsRule, t.home.separateGroupsRuleCopy],
               ].map(([title, copy]) => (
@@ -118,7 +130,9 @@ export default async function Home() {
                   className="rounded-2xl border border-black/5 bg-white/70 p-4"
                 >
                   <p className="text-sm font-semibold text-ink">{title}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {copy}
+                  </p>
                 </div>
               ))}
             </div>
@@ -145,6 +159,7 @@ export default async function Home() {
 
           <div className="scroll-mt-8" id="matchday-snapshot">
             <UpcomingMatchesSnapshot
+              matchHeightToId="rules"
               matches={matches.map((match) => ({
                 ...match,
                 kickoffAt: match.kickoffAt.toISOString(),

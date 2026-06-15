@@ -137,6 +137,15 @@ export const translations = {
       exactScoreRuleCopy: "Get the final score exactly right for 3 points.",
       outcomeRule: "Correct outcome",
       outcomeRuleCopy: "Pick the right winner or draw for 1 point if the score is not exact.",
+      multiplierRule: "Knockout multipliers",
+      multiplierRuleCopy:
+        "Round of 16 and quarter-finals count x2. Semi-finals, the third-place match, and the final count x3.",
+      multiplierDoublePhase: "Round of 16 and quarter-finals",
+      multiplierDoubleCopy:
+        "This means 6 points for an exact score, or 2 points for the correct winner or draw.",
+      multiplierTriplePhase: "Semi-finals, third place, and final",
+      multiplierTripleCopy:
+        "This means 9 points for an exact score, or 3 points for the correct winner or draw.",
       deadlineRule: "Prediction deadlines",
       deadlineRuleCopy:
         "Each match locks at its own kickoff, so you can keep editing a prediction until that game starts.",
@@ -200,6 +209,26 @@ export const translations = {
       leaderboardTitle: "Live standings for this group",
       leaderboardCopy:
         "Score 3 points for an exact score, 1 point for the correct winner or draw, and 0 points if the outcome is wrong.",
+      baseScoringTitle: "Base scoring",
+      baseScoringCopy:
+        "Exact score: 3 points. Correct winner or draw: 1 point. Wrong outcome: 0 points.",
+      multiplierTitle: "Knockout multipliers",
+      multiplierCopy:
+        "Round of 16 and quarter-finals count x2. Semi-finals, third-place match, and final count x3.",
+      multiplierDoubleTitle: "Round of 16 and quarter-finals",
+      multiplierDoubleCopy:
+        "Exact scores are worth 6 points. Correct winners or draws are worth 2 points.",
+      multiplierTripleTitle: "Semi-finals, third place, and final",
+      multiplierTripleCopy:
+        "Exact scores are worth 9 points. Correct winners or draws are worth 3 points.",
+      scoringTableTitle: "Points by phase",
+      scoringPhase: "Phase",
+      scoringExact: "Exact",
+      scoringOutcome: "Outcome",
+      scoringIncorrect: "Incorrect",
+      scoringPhaseBase: "Group stage and round of 32",
+      scoringPhaseDouble: "Round of 16 and quarter-finals",
+      scoringPhaseTriple: "Semi-finals, third place, and final",
       members: "Members",
       inviteCode: "Invite code",
       player: "Player",
@@ -407,7 +436,17 @@ export const translations = {
       exactScoreRule: "Marcador exacto",
       exactScoreRuleCopy: "Acertar el marcador final exacto vale 3 puntos.",
       outcomeRule: "Resultado correcto",
-      outcomeRuleCopy: "Acertar el ganador o empate vale 1 punto si el marcador no es exacto.",
+      outcomeRuleCopy:
+        "Acertar el ganador o empate vale 1 punto si el marcador no es exacto.",
+      multiplierRule: "Multiplicadores",
+      multiplierRuleCopy:
+        "Octavos y cuartos x2. Semifinales, el partido por el tercer puesto y la final x3.",
+      multiplierDoublePhase: "Octavos y cuartos",
+      multiplierDoubleCopy:
+        "Esto significa 6 puntos por marcador exacto, o 2 puntos por acertar ganador o empate.",
+      multiplierTriplePhase: "Semifinales, tercer puesto y final",
+      multiplierTripleCopy:
+        "Esto significa 9 puntos por marcador exacto, o 3 puntos por acertar ganador o empate.",
       deadlineRule: "Cierres de predicción",
       deadlineRuleCopy:
         "Cada partido se cierra en su propio inicio, así que puedes editar una predicción hasta que empiece ese partido.",
@@ -471,6 +510,26 @@ export const translations = {
       leaderboardTitle: "Tabla en vivo de este grupo",
       leaderboardCopy:
         "Gana 3 puntos por acertar el marcador exacto, 1 punto por acertar el ganador o empate y 0 puntos si el resultado es incorrecto.",
+      baseScoringTitle: "Puntuación base",
+      baseScoringCopy:
+        "Marcador exacto: 3 puntos. Ganador o empate correcto: 1 punto.",
+      multiplierTitle: "Multiplicadores",
+      multiplierCopy:
+        "Octavos y cuartos: x2. Semifinales, tercer puesto y final: x3.",
+      multiplierDoubleTitle: "Octavos y cuartos",
+      multiplierDoubleCopy:
+        "Marcador exacto: 6 puntos. Ganador o empate correcto: 2 puntos.",
+      multiplierTripleTitle: "Semifinales, tercer puesto y final",
+      multiplierTripleCopy:
+        "Marcador exacto: 9 puntos. Ganador o empate correcto: 3 puntos.",
+      scoringTableTitle: "Puntos por fase",
+      scoringPhase: "Fase",
+      scoringExact: "Exacto",
+      scoringOutcome: "Resultado",
+      scoringIncorrect: "Incorrecto",
+      scoringPhaseBase: "Fase de grupos y dieciseisavos",
+      scoringPhaseDouble: "Octavos y cuartos",
+      scoringPhaseTriple: "Semifinales, tercer puesto y final",
       members: "Participantes",
       inviteCode: "Código de invitación",
       player: "Jugador",

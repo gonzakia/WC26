@@ -232,8 +232,13 @@ export default async function GroupPage({ params }: GroupPageProps) {
               })}
             </div>
 
-            <div className="mt-6 rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-700">
-              {t.groupPage.leaderboardCopy}
+            <div className="mt-6">
+              <div className="rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-700">
+                <p className="font-semibold text-ink">
+                  {t.groupPage.baseScoringTitle}
+                </p>
+                <p className="mt-1">{t.groupPage.baseScoringCopy}</p>
+              </div>
             </div>
           </div>
         </section>

@@ -522,6 +522,13 @@ export async function confirmMatchResult(formData: FormData) {
 
   const predictions = await prisma.prediction.findMany({
     where: { matchId },
+    include: {
+      match: {
+        select: {
+          stage: true,
+        },
+      },
+    },
   });
 
   const affectedGroupIds = [...new Set(predictions.map((prediction) => prediction.groupId))];
@@ -540,6 +547,7 @@ export async function confirmMatchResult(formData: FormData) {
               homeScore,
               awayScore,
             },
+            prediction.match.stage,
           ),
         },
       }),

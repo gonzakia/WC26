@@ -120,6 +120,13 @@ function revalidateAppPath(path: string) {
 async function updatePredictionScores(matchId: string, homeScore: number, awayScore: number) {
   const predictions = await prisma.prediction.findMany({
     where: { matchId },
+    include: {
+      match: {
+        select: {
+          stage: true,
+        },
+      },
+    },
   });
 
   await Promise.all(
@@ -136,6 +143,7 @@ async function updatePredictionScores(matchId: string, homeScore: number, awaySc
               homeScore,
               awayScore,
             },
+            prediction.match.stage,
           ),
         },
       }),
