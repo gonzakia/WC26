@@ -37,23 +37,18 @@ export function PredictionForm({
   const [state, formAction, isPending] = useActionState(savePredictionWithFeedback, {
     savedAt: 0,
   });
-  const [showSaved, setShowSaved] = useState(false);
+  const [hasSavedPrediction, setHasSavedPrediction] = useState(
+    defaultHome !== undefined && defaultAway !== undefined,
+  );
   const homeLabel = getCountryLabel(homeTeam, locale);
   const awayLabel = getCountryLabel(awayTeam, locale);
   const homeInputId = `${matchId}-predicted-home`;
   const awayInputId = `${matchId}-predicted-away`;
 
   useEffect(() => {
-    if (!state.savedAt) {
-      return;
+    if (state.savedAt) {
+      setHasSavedPrediction(true);
     }
-
-    setShowSaved(true);
-    const timer = window.setTimeout(() => {
-      setShowSaved(false);
-    }, 2500);
-
-    return () => window.clearTimeout(timer);
   }, [state.savedAt]);
 
   return (
@@ -119,7 +114,9 @@ export function PredictionForm({
       <span
         aria-live="polite"
         className={`rounded-full bg-pitch-50 px-3 py-2 text-xs font-semibold text-pitch-900 shadow-sm transition ${
-          showSaved ? "opacity-100" : "pointer-events-none opacity-0"
+          !isPending && (hasSavedPrediction || state.savedAt)
+            ? "opacity-100"
+            : "pointer-events-none opacity-0"
         }`}
       >
         {labels.savedPick ?? "Saved"}

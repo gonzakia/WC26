@@ -111,8 +111,8 @@
   --app-bg-start: #fefce8;
   --app-bg-end: #fef3c7;
   --app-glow: 202 138 4;
-  --color-panel: 113 63 18;
-  --color-panel-soft: 133 77 14;
+  --color-panel: 202 138 4;
+  --color-panel-soft: 234 179 8;
   --color-sand: 254 243 199;
   --color-pitch-50: 254 252 232;
   --color-pitch-100: 254 249 195;
@@ -300,7 +300,9 @@ body {
 [data-mode="dark"] .bg-white\/70,
 [data-mode="dark"] .bg-white\/75,
 [data-mode="dark"] .bg-white\/80,
-[data-mode="dark"] .bg-white\/85 {
+[data-mode="dark"] .bg-white\/85,
+[data-mode="dark"] .bg-white\/90,
+[data-mode="dark"] .bg-white\/95 {
   background-color: rgb(var(--color-surface) / 0.86) !important;
 }
 
