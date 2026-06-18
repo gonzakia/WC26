@@ -56,6 +56,9 @@ export const translations = {
       savePick: "Save pick",
       savingPick: "Saving...",
       savedPick: "Saved",
+      copyPrompt: "You do not have a prediction for this match in these groups. Use this same pick there?",
+      copyToSelected: "Copy to selected",
+      copiedPick: "Copied to selected groups",
     },
     auth: {
       appName: "WC26 Predictions",
@@ -356,6 +359,10 @@ export const translations = {
       savePick: "Guardar predicción",
       savingPick: "Guardando...",
       savedPick: "Guardada",
+      copyPrompt:
+        "No tienes predicción para este partido en estos grupos. ¿Quieres usar esta misma?",
+      copyToSelected: "Copiar a seleccionados",
+      copiedPick: "Copiada a los grupos seleccionados",
     },
     auth: {
       appName: "WC26 Predictions",

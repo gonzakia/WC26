@@ -9,6 +9,10 @@ type PredictionFormProps = {
   matchId: string;
   homeTeam: string;
   awayTeam: string;
+  copyTargets?: Array<{
+    id: string;
+    name: string;
+  }>;
   locale?: string;
   defaultHome?: number;
   defaultAway?: number;
@@ -19,6 +23,9 @@ type PredictionFormProps = {
     savePick: string;
     savingPick?: string;
     savedPick?: string;
+    copyPrompt?: string;
+    copyToSelected?: string;
+    copiedPick?: string;
     locked: string;
   };
 };
@@ -28,6 +35,7 @@ export function PredictionForm({
   matchId,
   homeTeam,
   awayTeam,
+  copyTargets = [],
   locale = "en-US",
   defaultHome,
   defaultAway,
@@ -36,6 +44,7 @@ export function PredictionForm({
 }: PredictionFormProps) {
   const [state, formAction, isPending] = useActionState(savePredictionWithFeedback, {
     savedAt: 0,
+    copiedGroupIds: [],
   });
   const [hasSavedPrediction, setHasSavedPrediction] = useState(
     defaultHome !== undefined && defaultAway !== undefined,
@@ -44,6 +53,11 @@ export function PredictionForm({
   const awayLabel = getCountryLabel(awayTeam, locale);
   const homeInputId = `${matchId}-predicted-home`;
   const awayInputId = `${matchId}-predicted-away`;
+  const visibleCopyTargets = copyTargets.filter(
+    (target) => !state.copiedGroupIds.includes(target.id),
+  );
+  const showCopyPrompt =
+    hasSavedPrediction && !isPending && !locked && visibleCopyTargets.length > 0;
 
   useEffect(() => {
     if (state.savedAt) {
@@ -121,6 +135,41 @@ export function PredictionForm({
       >
         {labels.savedPick ?? "Saved"}
       </span>
+      {showCopyPrompt ? (
+        <div className="basis-full rounded-2xl border border-white/10 bg-white/10 p-3 text-sm text-white">
+          <p className="font-semibold">
+            {labels.copyPrompt ?? "Copy this prediction to other groups?"}
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {visibleCopyTargets.map((target) => (
+              <label
+                className="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm"
+                key={target.id}
+              >
+                <input
+                  className="h-4 w-4 accent-[rgb(var(--color-pitch-500))]"
+                  name="copyGroupIds"
+                  type="checkbox"
+                  value={target.id}
+                />
+                <span>{target.name}</span>
+              </label>
+            ))}
+          </div>
+          <button
+            className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-ink transition hover:bg-pitch-50"
+            disabled={isPending}
+            type="submit"
+          >
+            {labels.copyToSelected ?? "Copy to selected"}
+          </button>
+        </div>
+      ) : null}
+      {!isPending && state.copiedGroupIds.length > 0 ? (
+        <span className="basis-full text-xs font-semibold text-pitch-100">
+          {labels.copiedPick ?? "Copied to selected groups"}
+        </span>
+      ) : null}
     </form>
   );
 }

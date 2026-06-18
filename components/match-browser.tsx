@@ -44,11 +44,17 @@ type BrowserPrediction = {
   predictedAway: number;
 };
 
+type CopyTargetGroup = {
+  id: string;
+  name: string;
+};
+
 type MatchBrowserProps = {
   groupId: string;
   matches: BrowserMatch[];
   members: GroupPredictionMember[];
   predictionsByMatchId: Record<string, BrowserPrediction>;
+  copyTargetsByMatchId: Record<string, CopyTargetGroup[]>;
   locale: string;
   labels: {
     common: {
@@ -59,6 +65,9 @@ type MatchBrowserProps = {
       savePick: string;
       savingPick: string;
       savedPick: string;
+      copyPrompt: string;
+      copyToSelected: string;
+      copiedPick: string;
       locked: string;
       open: string;
     };
@@ -210,6 +219,7 @@ function MatchItem({
   locale,
   matches,
   members,
+  copyTargets,
 }: {
   match: BrowserMatch;
   groupId: string;
@@ -218,6 +228,7 @@ function MatchItem({
   locale: string;
   matches: BrowserMatch[];
   members: GroupPredictionMember[];
+  copyTargets: CopyTargetGroup[];
 }) {
   const [showDetailedPredictions, setShowDetailedPredictions] = useState(false);
   const language = locale.startsWith("es") ? "es" : "en";
@@ -296,9 +307,13 @@ function MatchItem({
             savePick: labels.common.savePick,
             savingPick: labels.common.savingPick,
             savedPick: labels.common.savedPick,
+            copyPrompt: labels.common.copyPrompt,
+            copyToSelected: labels.common.copyToSelected,
+            copiedPick: labels.common.copiedPick,
             locked: labels.common.locked,
           }}
           matchId={match.id}
+          copyTargets={copyTargets}
         />
       </div>
 
@@ -321,6 +336,7 @@ export function MatchBrowser({
   matches,
   members,
   predictionsByMatchId,
+  copyTargetsByMatchId,
   locale,
   labels,
 }: MatchBrowserProps) {
@@ -426,6 +442,7 @@ export function MatchBrowser({
                       match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
                       members={members}
                       prediction={predictionsByMatchId[match.id]}
+                      copyTargets={copyTargetsByMatchId[match.id] ?? []}
                     />
                   )),
                 )}
@@ -513,6 +530,7 @@ export function MatchBrowser({
                                 }}
                                 members={members}
                                 prediction={predictionsByMatchId[match.id]}
+                                copyTargets={copyTargetsByMatchId[match.id] ?? []}
                               />
                             ))}
                           </div>
@@ -639,6 +657,7 @@ export function MatchBrowser({
                               match={{ ...match, kickoffAt: match.kickoffAt.toISOString() }}
                               members={members}
                               prediction={predictionsByMatchId[match.id]}
+                              copyTargets={copyTargetsByMatchId[match.id] ?? []}
                             />
                           ))}
                         </div>

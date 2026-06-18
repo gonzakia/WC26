@@ -144,14 +144,14 @@ export default async function Home() {
               >
                 {t.home.openDashboard}
               </a>
-              {/* Uncomment this to update results manually
+              {/* Uncomment this to update results manually*/}
               <Link
                 className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-6 py-3 text-sm font-semibold text-ink transition hover:bg-white"
                 href={localizePath("/admin/results", locale)}
               >
                 {t.home.enterResults}
               </Link>
-              */}
+              
             </div>
 
 

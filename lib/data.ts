@@ -49,7 +49,15 @@ export async function getGroupPageData(groupId: string) {
     return null;
   }
 
-  const [group, members, currentUserPredictions, matches] = await Promise.all([
+  const [
+    group,
+    members,
+    currentUserPredictions,
+    allCurrentUserPredictions,
+    currentUserMemberships,
+    matches,
+  ] =
+    await Promise.all([
     prisma.group.findUnique({
       where: { id: groupId },
       include: {
@@ -84,10 +92,35 @@ export async function getGroupPageData(groupId: string) {
         userId: currentUser.id,
       },
     }),
-    prisma.match.findMany({
-      orderBy: { kickoffAt: "asc" },
-    }),
-  ]);
+      prisma.prediction.findMany({
+        where: {
+          userId: currentUser.id,
+        },
+        select: {
+          groupId: true,
+          matchId: true,
+        },
+      }),
+      prisma.groupMember.findMany({
+        where: { userId: currentUser.id },
+        include: {
+          group: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: {
+          group: {
+            createdAt: "desc",
+          },
+        },
+      }),
+      prisma.match.findMany({
+        orderBy: { kickoffAt: "asc" },
+      }),
+    ]);
 
   if (!group) {
     return null;
@@ -112,6 +145,8 @@ export async function getGroupPageData(groupId: string) {
   return {
     currentUser,
     membership,
+    allCurrentUserPredictions,
+    currentUserMemberships,
     group: {
       ...group,
       members,

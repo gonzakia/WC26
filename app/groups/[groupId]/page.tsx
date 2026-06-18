@@ -31,7 +31,16 @@ export default async function GroupPage({ params }: GroupPageProps) {
     notFound();
   }
 
-  const { currentUser, group, membership, leaderboard, matches, predictionsByMatchId } = data;
+  const {
+    currentUser,
+    group,
+    membership,
+    leaderboard,
+    matches,
+    predictionsByMatchId,
+    currentUserMemberships,
+    allCurrentUserPredictions,
+  } = data;
   const now = new Date();
   const predictionMembers = group.members.map((member) => ({
     id: member.id,
@@ -76,6 +85,26 @@ export default async function GroupPage({ params }: GroupPageProps) {
       kickoffTime - PREDICTION_READINESS_WINDOW_MS <= now.getTime()
     );
   });
+  const predictionGroupKeys = new Set(
+    allCurrentUserPredictions.map(
+      (prediction) => `${prediction.matchId}:${prediction.groupId}`,
+    ),
+  );
+  const copyTargetsByMatchId = Object.fromEntries(
+    matches.map((match) => [
+      match.id,
+      currentUserMemberships
+        .filter((targetMembership) => targetMembership.groupId !== group.id)
+        .filter(
+          (targetMembership) =>
+            !predictionGroupKeys.has(`${match.id}:${targetMembership.groupId}`),
+        )
+        .map((targetMembership) => ({
+          id: targetMembership.group.id,
+          name: targetMembership.group.name,
+        })),
+    ]),
+  );
 
   return (
     <main className="bg-app min-h-screen px-6 py-10 lg:px-10">
@@ -161,6 +190,9 @@ export default async function GroupPage({ params }: GroupPageProps) {
                   savePick: t.common.savePick,
                   savingPick: t.common.savingPick,
                   savedPick: t.common.savedPick,
+                  copyPrompt: t.common.copyPrompt,
+                  copyToSelected: t.common.copyToSelected,
+                  copiedPick: t.common.copiedPick,
                   locked: t.common.locked,
                   open: t.common.open,
                 },
@@ -177,6 +209,7 @@ export default async function GroupPage({ params }: GroupPageProps) {
               }))}
               members={predictionMembers}
               predictionsByMatchId={Object.fromEntries(predictionsByMatchId.entries())}
+              copyTargetsByMatchId={copyTargetsByMatchId}
             />
           </div>
 

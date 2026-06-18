@@ -49,10 +49,10 @@ export function PredictionReadiness({
   }
 
   return (
-    <section className="mt-8 rounded-[2rem] border border-amber-200 bg-white/85 p-6 shadow-glow backdrop-blur lg:p-8">
+    <section className="mt-8 rounded-[2rem] border border-pitch-300 bg-white/85 p-6 shadow-glow backdrop-blur lg:p-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-pitch-700">
             {labels.eyebrow}
           </p>
           <h2 className="mt-3 text-3xl font-semibold text-ink">{labels.title}</h2>
@@ -60,7 +60,7 @@ export function PredictionReadiness({
             {labels.copy}
           </p>
         </div>
-        <Clock3 className="h-6 w-6 text-amber-700" />
+        <Clock3 className="h-6 w-6 text-pitch-700" />
       </div>
 
       <div className="mt-6 space-y-5">

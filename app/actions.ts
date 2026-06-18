@@ -415,6 +415,10 @@ export async function savePrediction(formData: FormData) {
   const currentUser = await requireCurrentUser();
   const groupId = String(formData.get("groupId") ?? "");
   const matchId = String(formData.get("matchId") ?? "");
+  const copyGroupIds = formData
+    .getAll("copyGroupIds")
+    .map((value) => String(value))
+    .filter((value) => value && value !== groupId);
 
   if (!groupId || !matchId) {
     throw new Error("Group and match are required.");
@@ -477,21 +481,80 @@ export async function savePrediction(formData: FormData) {
     },
   });
 
+  let copiedGroupIds: string[] = [];
+
+  if (copyGroupIds.length > 0) {
+    const uniqueCopyGroupIds = [...new Set(copyGroupIds)];
+    const [targetMemberships, existingPredictions] = await Promise.all([
+      prisma.groupMember.findMany({
+        where: {
+          userId: currentUser.id,
+          groupId: {
+            in: uniqueCopyGroupIds,
+          },
+        },
+        select: {
+          groupId: true,
+        },
+      }),
+      prisma.prediction.findMany({
+        where: {
+          userId: currentUser.id,
+          matchId,
+          groupId: {
+            in: uniqueCopyGroupIds,
+          },
+        },
+        select: {
+          groupId: true,
+        },
+      }),
+    ]);
+    const existingGroupIds = new Set(
+      existingPredictions.map((prediction) => prediction.groupId),
+    );
+    const targetGroupIds = targetMemberships
+      .map((targetMembership) => targetMembership.groupId)
+      .filter((targetGroupId) => !existingGroupIds.has(targetGroupId));
+
+    if (targetGroupIds.length > 0) {
+      await prisma.prediction.createMany({
+        data: targetGroupIds.map((targetGroupId) => ({
+          predictedHome,
+          predictedAway,
+          lockedAt: predictionDeadline,
+          userId: currentUser.id,
+          groupId: targetGroupId,
+          matchId,
+        })),
+        skipDuplicates: true,
+      });
+      copiedGroupIds = targetGroupIds;
+    }
+  }
+
   revalidatePath(`/groups/${groupId}`);
+  copiedGroupIds.forEach((targetGroupId) => {
+    revalidatePath(`/groups/${targetGroupId}`);
+  });
+
+  return copiedGroupIds;
 }
 
 type PredictionSaveState = {
   savedAt: number;
+  copiedGroupIds: string[];
 };
 
 export async function savePredictionWithFeedback(
-  _state: PredictionSaveState,
+  state: PredictionSaveState,
   formData: FormData,
 ) {
-  await savePrediction(formData);
+  const copiedGroupIds = await savePrediction(formData);
 
   return {
     savedAt: Date.now(),
+    copiedGroupIds: [...new Set([...state.copiedGroupIds, ...copiedGroupIds])],
   };
 }
 
