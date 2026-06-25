@@ -1,5 +1,6 @@
 "use client";
 
+import type { KeyboardEvent } from "react";
 import { useActionState, useEffect, useState } from "react";
 import { savePredictionWithFeedback } from "@/app/actions";
 import { getCountryFlag, getCountryLabel } from "@/lib/country-labels";
@@ -17,6 +18,7 @@ type PredictionFormProps = {
   defaultHome?: number;
   defaultAway?: number;
   locked: boolean;
+  variant?: "default" | "compact";
   labels: {
     home: string;
     away: string;
@@ -40,6 +42,7 @@ export function PredictionForm({
   defaultHome,
   defaultAway,
   locked,
+  variant = "default",
   labels,
 }: PredictionFormProps) {
   const [state, formAction, isPending] = useActionState(savePredictionWithFeedback, {
@@ -57,7 +60,11 @@ export function PredictionForm({
     (target) => !state.copiedGroupIds.includes(target.id),
   );
   const showCopyPrompt =
-    hasSavedPrediction && !isPending && !locked && visibleCopyTargets.length > 0;
+    variant !== "compact" &&
+    hasSavedPrediction &&
+    !isPending &&
+    !locked &&
+    visibleCopyTargets.length > 0;
 
   useEffect(() => {
     if (state.savedAt) {
@@ -65,15 +72,61 @@ export function PredictionForm({
     }
   }, [state.savedAt]);
 
+  function moveBetweenCompactInputs(event: KeyboardEvent<HTMLInputElement>) {
+    if (variant !== "compact") {
+      return;
+    }
+
+    const offsets: Record<string, number> = {
+      ArrowLeft: -1,
+      ArrowRight: 1,
+      ArrowUp: -2,
+      ArrowDown: 2,
+    };
+    const offset = offsets[event.key];
+
+    if (!offset) {
+      return;
+    }
+
+    const inputs = Array.from(
+      document.querySelectorAll<HTMLInputElement>("[data-score-grid-input='true']"),
+    );
+    const currentIndex = inputs.indexOf(event.currentTarget);
+    const nextInput = inputs[currentIndex + offset];
+
+    if (!nextInput) {
+      return;
+    }
+
+    event.preventDefault();
+    nextInput.focus();
+    nextInput.select();
+  }
+
   return (
-    <form action={formAction} className="flex flex-wrap items-end gap-3">
+    <form
+      action={formAction}
+      className={
+        variant === "compact"
+          ? "flex min-w-max items-center gap-1"
+          : "flex flex-wrap items-end gap-3"
+      }
+    >
       <input name="groupId" type="hidden" value={groupId} />
       <input name="matchId" type="hidden" value={matchId} />
 
+      <div
+        className={
+          variant === "compact"
+            ? "flex items-center bg-white"
+            : "contents"
+        }
+      >
       <div>
         <label
           aria-label={`${homeLabel} ${labels.home}`}
-          className="block text-center"
+          className={variant === "compact" ? "sr-only" : "block text-center"}
           htmlFor={homeInputId}
           title={`${homeLabel} ${labels.home}`}
         >
@@ -82,20 +135,30 @@ export function PredictionForm({
           </span>
         </label>
         <input
-          className="mt-2 w-20 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
+          className={
+            variant === "compact"
+              ? "h-7 w-10 rounded-none border-0 bg-transparent px-1 text-center text-xs font-semibold text-ink outline-none ring-0 focus:bg-pitch-50 sm:h-8 sm:w-12"
+              : "mt-2 w-20 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
+          }
+          data-score-grid-input={variant === "compact" ? "true" : undefined}
           defaultValue={defaultHome ?? ""}
           id={homeInputId}
           min={0}
           name="predictedHome"
+          onKeyDown={moveBetweenCompactInputs}
           required
           type="number"
         />
       </div>
 
+        {variant === "compact" ? (
+          <span className="text-xs font-semibold text-slate-300">-</span>
+        ) : null}
+
       <div>
         <label
           aria-label={`${awayLabel} ${labels.away}`}
-          className="block text-center"
+          className={variant === "compact" ? "sr-only" : "block text-center"}
           htmlFor={awayInputId}
           title={`${awayLabel} ${labels.away}`}
         >
@@ -104,18 +167,29 @@ export function PredictionForm({
           </span>
         </label>
         <input
-          className="mt-2 w-20 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
+          className={
+            variant === "compact"
+              ? "h-7 w-10 rounded-none border-0 bg-transparent px-1 text-center text-xs font-semibold text-ink outline-none ring-0 focus:bg-pitch-50 sm:h-8 sm:w-12"
+              : "mt-2 w-20 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-semibold text-ink outline-none focus:border-pitch-500"
+          }
+          data-score-grid-input={variant === "compact" ? "true" : undefined}
           defaultValue={defaultAway ?? ""}
           id={awayInputId}
           min={0}
           name="predictedAway"
+          onKeyDown={moveBetweenCompactInputs}
           required
           type="number"
         />
       </div>
+      </div>
 
       <button
-        className="inline-flex rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+        className={
+          variant === "compact"
+            ? "inline-flex rounded-sm bg-ink px-2 py-1 text-[0.68rem] font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300 sm:px-3"
+            : "inline-flex rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+        }
         disabled={locked || isPending}
         type="submit"
       >
@@ -127,7 +201,9 @@ export function PredictionForm({
       </button>
       <span
         aria-live="polite"
-        className={`rounded-full bg-pitch-50 px-3 py-2 text-xs font-semibold text-pitch-900 shadow-sm transition ${
+        className={`rounded-full bg-pitch-50 text-xs font-semibold text-pitch-900 shadow-sm transition ${
+          variant === "compact" ? "px-2 py-1" : "px-3 py-2"
+        } ${
           !isPending && (hasSavedPrediction || state.savedAt)
             ? "opacity-100"
             : "pointer-events-none opacity-0"

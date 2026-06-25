@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   GitBranch,
   ListChecks,
+  Table2,
 } from "lucide-react";
 import {
   GroupPredictionList,
@@ -75,6 +76,11 @@ type MatchBrowserProps = {
       toggleMenu: string;
       dateMenu: string;
       stageMenu: string;
+      tableMenu: string;
+      tableTime: string;
+      tableHome: string;
+      tableAway: string;
+      tableScore: string;
       groupStage: string;
       knockoutBracket: string;
       backToGroups: string;
@@ -181,6 +187,71 @@ function formatKickoff(value: string, locale: string) {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
+}
+
+function formatCompactKickoff(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+const TEAM_CODES: Record<string, string> = {
+  Algeria: "ALG",
+  Argentina: "ARG",
+  Australia: "AUS",
+  Austria: "AUT",
+  Belgium: "BEL",
+  "Bosnia-Herzegovina": "BIH",
+  Brazil: "BRA",
+  Canada: "CAN",
+  "Cape Verde": "CPV",
+  "Cape Verde Islands": "CPV",
+  Colombia: "COL",
+  "Congo DR": "COD",
+  Croatia: "CRO",
+  Curaçao: "CUW",
+  Czechia: "CZE",
+  Ecuador: "ECU",
+  Egypt: "EGY",
+  England: "ENG",
+  France: "FRA",
+  Germany: "GER",
+  Ghana: "GHA",
+  Haiti: "HAI",
+  Iran: "IRN",
+  Iraq: "IRQ",
+  "Ivory Coast": "CIV",
+  Japan: "JPN",
+  Jordan: "JOR",
+  Mexico: "MEX",
+  Morocco: "MAR",
+  Netherlands: "NED",
+  "New Zealand": "NZL",
+  Norway: "NOR",
+  Panama: "PAN",
+  Paraguay: "PAR",
+  Portugal: "POR",
+  Qatar: "QAT",
+  "Saudi Arabia": "KSA",
+  Scotland: "SCO",
+  Senegal: "SEN",
+  "South Africa": "RSA",
+  "South Korea": "KOR",
+  Spain: "ESP",
+  Sweden: "SWE",
+  Switzerland: "SUI",
+  Tunisia: "TUN",
+  Turkey: "TUR",
+  Uruguay: "URU",
+  "United States": "USA",
+  Uzbekistan: "UZB",
+};
+
+function getTeamCode(teamName: string) {
+  return TEAM_CODES[teamName] ?? teamName.slice(0, 3).toUpperCase();
 }
 
 function getFlagEmoji(teamName: string) {
@@ -360,7 +431,8 @@ export function MatchBrowser({
       matches: roundMatches,
     }));
 
-  const [openPrimary, setOpenPrimary] = useState<"date" | "stage">("date");
+  const [openPrimary, setOpenPrimary] =
+    useState<"date" | "stage" | "table" | null>("date");
   const [openDateKey, setOpenDateKey] = useState<string | null>(() =>
     getInitialDateKey(dates),
   );
@@ -389,7 +461,9 @@ export function MatchBrowser({
       <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[rgb(var(--color-panel-soft)/1)] text-white">
         <button
           className="flex w-full items-center justify-between px-5 py-4 text-left"
-          onClick={() => setOpenPrimary(openPrimary === "date" ? "stage" : "date")}
+          onClick={() =>
+            setOpenPrimary((current) => (current === "date" ? null : "date"))
+          }
           type="button"
         >
           <div className="flex items-center gap-3">
@@ -454,7 +528,9 @@ export function MatchBrowser({
       <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[rgb(var(--color-panel-soft)/1)] text-white">
         <button
           className="flex w-full items-center justify-between px-5 py-4 text-left"
-          onClick={() => setOpenPrimary(openPrimary === "stage" ? "date" : "stage")}
+          onClick={() =>
+            setOpenPrimary((current) => (current === "stage" ? null : "stage"))
+          }
           type="button"
         >
           <div className="flex items-center gap-3">
@@ -666,6 +742,97 @@ export function MatchBrowser({
                 </div>
               </div>
             )}
+          </div>
+        ) : null}
+      </section>
+
+      <section className="min-w-0 overflow-hidden rounded-[1.75rem] border border-black/5 bg-[rgb(var(--color-panel-soft)/1)] text-white">
+        <button
+          className="flex w-full items-center justify-between px-5 py-4 text-left"
+          onClick={() =>
+            setOpenPrimary((current) => (current === "table" ? null : "table"))
+          }
+          type="button"
+        >
+          <div className="flex items-center gap-3">
+            <Table2 className="h-5 w-5 text-pitch-200" />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-pitch-200">
+                {labels.matchBrowser.toggleMenu}
+              </p>
+              <h3 className="mt-1 text-xl font-semibold">{labels.matchBrowser.tableMenu}</h3>
+            </div>
+          </div>
+          <ChevronDown
+            className={`h-5 w-5 transition ${openPrimary === "table" ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {openPrimary === "table" ? (
+          <div className="border-t border-white/10 px-5 pb-5 pt-4">
+            <div className="score-grid overflow-x-auto border border-white/10 bg-white/5">
+              <table className="w-auto border-collapse text-left text-xs">
+                <colgroup>
+                  <col className="w-[7.25rem] sm:w-[8.5rem]" />
+                  <col className="w-[5.25rem] sm:w-[7.5rem]" />
+                  <col className="w-[5.25rem] sm:w-[7.5rem]" />
+                  <col className="w-[11rem] sm:w-[13.5rem]" />
+                </colgroup>
+                <thead className="bg-white/10 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-pitch-100">
+                  <tr>
+                    <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableTime}</th>
+                    <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableHome}</th>
+                    <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableAway}</th>
+                    <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableScore}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matchesWithDate.map((match) => {
+                    const locked = isPredictionLocked(match, matchesWithDate);
+                    const prediction = predictionsByMatchId[match.id];
+                    const isToday = getLocalDateKey(match.kickoffAt) === getLocalDateKey(new Date());
+                    const rowClass = isToday ? "bg-pitch-400/15" : "";
+
+                    return (
+                      <tr className={rowClass} key={match.id}>
+                        <td className="whitespace-nowrap border border-white/10 px-2 py-1 text-slate-100 sm:px-3 sm:py-2">
+                          {formatCompactKickoff(match.kickoffAt.toISOString(), locale)}
+                        </td>
+                        <td className="whitespace-nowrap border border-white/10 px-2 py-1 font-medium text-white sm:px-3 sm:py-2">
+                          <span className="mr-2">{getCountryFlag(match.homeTeam)}</span>
+                          {getTeamCode(match.homeTeam)}
+                        </td>
+                        <td className="whitespace-nowrap border border-white/10 px-2 py-1 font-medium text-white sm:px-3 sm:py-2">
+                          <span className="mr-2">{getCountryFlag(match.awayTeam)}</span>
+                          {getTeamCode(match.awayTeam)}
+                        </td>
+                        <td className="border border-white/10 px-1 py-0.5 sm:px-2 sm:py-1">
+                          <PredictionForm
+                            awayTeam={match.awayTeam}
+                            defaultAway={prediction?.predictedAway}
+                            defaultHome={prediction?.predictedHome}
+                            groupId={groupId}
+                            homeTeam={match.homeTeam}
+                            locale={locale}
+                            locked={locked}
+                            labels={{
+                              home: labels.common.home,
+                              away: labels.common.away,
+                              savePick: labels.common.savePick,
+                              savingPick: labels.common.savingPick,
+                              savedPick: labels.common.savedPick,
+                              locked: labels.common.locked,
+                            }}
+                            matchId={match.id}
+                            variant="compact"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : null}
       </section>

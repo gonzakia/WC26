@@ -295,6 +295,14 @@ body {
   background: rgb(var(--app-glow) / 0.2);
 }
 
+.score-grid :is(th, td) {
+  border-color: rgb(15 23 42 / 0.2);
+}
+
+[data-mode="dark"] .score-grid :is(th, td) {
+  border-color: rgb(var(--color-border) / 0.22);
+}
+
 [data-mode="dark"] .bg-white,
 [data-mode="dark"] .bg-white\/60,
 [data-mode="dark"] .bg-white\/70,
