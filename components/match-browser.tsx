@@ -17,6 +17,7 @@ import { PredictionForm } from "@/components/prediction-form";
 import { getCountryFlag, getCountryLabel } from "@/lib/country-labels";
 import { getMatchVenue } from "@/lib/manual-venues";
 import { isPredictionLocked } from "@/lib/prediction-deadlines";
+import { getMatchOutcome } from "@/lib/scoring";
 import {
   getKnockoutStageOrder,
   groupKnockoutMatchesByRound,
@@ -80,6 +81,7 @@ type MatchBrowserProps = {
       tableTime: string;
       tableHome: string;
       tableAway: string;
+      tableResult: string;
       tableScore: string;
       groupStage: string;
       knockoutBracket: string;
@@ -252,6 +254,38 @@ const TEAM_CODES: Record<string, string> = {
 
 function getTeamCode(teamName: string) {
   return TEAM_CODES[teamName] ?? teamName.slice(0, 3).toUpperCase();
+}
+
+function getTablePredictionStatus(
+  prediction: BrowserPrediction | undefined,
+  match: { resultConfirmed: boolean; homeScore: number | null; awayScore: number | null },
+) {
+  if (
+    !prediction ||
+    !match.resultConfirmed ||
+    match.homeScore === null ||
+    match.awayScore === null
+  ) {
+    return null;
+  }
+
+  if (
+    prediction.predictedHome === match.homeScore &&
+    prediction.predictedAway === match.awayScore
+  ) {
+    return "exact";
+  }
+
+  return getMatchOutcome({
+    homeScore: prediction.predictedHome,
+    awayScore: prediction.predictedAway,
+  }) ===
+    getMatchOutcome({
+      homeScore: match.homeScore,
+      awayScore: match.awayScore,
+    })
+    ? "outcome"
+    : null;
 }
 
 function getFlagEmoji(teamName: string) {
@@ -776,6 +810,7 @@ export function MatchBrowser({
                   <col className="w-[7.25rem] sm:w-[8.5rem]" />
                   <col className="w-[5.25rem] sm:w-[7.5rem]" />
                   <col className="w-[5.25rem] sm:w-[7.5rem]" />
+                  <col className="w-[4.75rem] sm:w-[5.5rem]" />
                   <col className="w-[11rem] sm:w-[13.5rem]" />
                 </colgroup>
                 <thead className="bg-white/10 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-pitch-100">
@@ -783,6 +818,7 @@ export function MatchBrowser({
                     <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableTime}</th>
                     <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableHome}</th>
                     <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableAway}</th>
+                    <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableResult}</th>
                     <th className="border border-white/10 px-2 py-1.5 sm:px-3 sm:py-2">{labels.matchBrowser.tableScore}</th>
                   </tr>
                 </thead>
@@ -790,8 +826,13 @@ export function MatchBrowser({
                   {matchesWithDate.map((match) => {
                     const locked = isPredictionLocked(match, matchesWithDate);
                     const prediction = predictionsByMatchId[match.id];
+                    const predictionStatus = getTablePredictionStatus(prediction, match);
                     const isToday = getLocalDateKey(match.kickoffAt) === getLocalDateKey(new Date());
                     const rowClass = isToday ? "bg-pitch-400/15" : "";
+                    const result =
+                      match.homeScore !== null && match.awayScore !== null
+                        ? `${match.homeScore}-${match.awayScore}`
+                        : "-";
 
                     return (
                       <tr className={rowClass} key={match.id}>
@@ -805,6 +846,9 @@ export function MatchBrowser({
                         <td className="whitespace-nowrap border border-white/10 px-2 py-1 font-medium text-white sm:px-3 sm:py-2">
                           <span className="mr-2">{getCountryFlag(match.awayTeam)}</span>
                           {getTeamCode(match.awayTeam)}
+                        </td>
+                        <td className="whitespace-nowrap border border-white/10 px-2 py-1 text-center font-semibold text-white sm:px-3 sm:py-2">
+                          {result}
                         </td>
                         <td className="border border-white/10 px-1 py-0.5 sm:px-2 sm:py-1">
                           <PredictionForm
@@ -824,6 +868,7 @@ export function MatchBrowser({
                               locked: labels.common.locked,
                             }}
                             matchId={match.id}
+                            compactStatus={predictionStatus}
                             variant="compact"
                           />
                         </td>

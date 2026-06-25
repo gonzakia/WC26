@@ -19,6 +19,7 @@ type PredictionFormProps = {
   defaultAway?: number;
   locked: boolean;
   variant?: "default" | "compact";
+  compactStatus?: "exact" | "outcome" | null;
   labels: {
     home: string;
     away: string;
@@ -43,6 +44,7 @@ export function PredictionForm({
   defaultAway,
   locked,
   variant = "default",
+  compactStatus = null,
   labels,
 }: PredictionFormProps) {
   const [state, formAction, isPending] = useActionState(savePredictionWithFeedback, {
@@ -65,6 +67,12 @@ export function PredictionForm({
     !isPending &&
     !locked &&
     visibleCopyTargets.length > 0;
+  const compactScoreClass =
+    compactStatus === "exact"
+      ? "flex items-center bg-emerald-200"
+      : compactStatus === "outcome"
+        ? "flex items-center bg-emerald-50"
+        : "flex items-center bg-white";
 
   useEffect(() => {
     if (state.savedAt) {
@@ -119,7 +127,7 @@ export function PredictionForm({
       <div
         className={
           variant === "compact"
-            ? "flex items-center bg-white"
+            ? compactScoreClass
             : "contents"
         }
       >
